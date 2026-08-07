@@ -8,7 +8,7 @@ export default function TablaGastos({ mesId, perfil, datos, isAlejandro, configu
   const [isAdding, setIsAdding] = useState(false);
   const [nuevoNombre, setNuevoNombre] = useState('');
   const [nuevoValor, setNuevoValor] = useState('');
-  
+
   const [workingDays, setWorkingDays] = useState({ q1Days: 0, q2Days: 0 });
 
   const formatter = new Intl.NumberFormat('es-CO', {
@@ -38,7 +38,7 @@ export default function TablaGastos({ mesId, perfil, datos, isAlejandro, configu
   // 1. Cálculos de Inmutables
   const inmutables = useMemo(() => {
     const tarifaTransporte = isAlejandro ? (configuracion?.tarifa_integrado || 4715) * 2 : (configuracion?.tarifa_metro || 3820) * 2;
-    
+
     return [
       { id: 'diezmo', nombre: 'Diezmo (10%)', valorQ1: (totalIngresosFijos * 0.1) / 2, valorQ2: (totalIngresosFijos * 0.1) / 2, inmutable: true },
       { id: 'salud', nombre: 'Salud (4%)', valorQ1: (totalIngresosFijos * 0.04) / 2, valorQ2: (totalIngresosFijos * 0.04) / 2, inmutable: true },
@@ -138,7 +138,7 @@ export default function TablaGastos({ mesId, perfil, datos, isAlejandro, configu
   const totalFijos = gastosFijos.reduce((sum, item) => sum + (Number(item.valor) || 0), 0);
   const totalVariables = gastosVariables.reduce((sum, item) => sum + (Number(item.valor) || 0), 0);
   const granTotal = totalInmutables + totalFijos + totalVariables + (Number(reserva.valor) || 0);
-  
+
   // Métrica visual que solicitaste
   const disponible = totalIngresos - granTotal;
 
@@ -169,8 +169,8 @@ export default function TablaGastos({ mesId, perfil, datos, isAlejandro, configu
         </label>
       </td>
       <td className="px-6 py-4 text-center">
-        {isAuto ? <span className="text-xs text-slate-400 italic">Auto</span> : 
-         onDelete ? <button onClick={onDelete} className="p-1 text-slate-400 hover:text-rose-500 transition-colors"><Trash2 className="w-4 h-4" /></button> : null}
+        {isAuto ? <span className="text-xs text-slate-400 italic">Auto</span> :
+          onDelete ? <button onClick={onDelete} className="p-1 text-slate-400 hover:text-rose-500 transition-colors"><Trash2 className="w-4 h-4" /></button> : null}
       </td>
     </tr>
   );
@@ -196,13 +196,13 @@ export default function TablaGastos({ mesId, perfil, datos, isAlejandro, configu
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-200 text-sm">
-            
+
             {/* SECCIÓN 1: INMUTABLES */}
             <tr className="bg-slate-50 border-t-2 border-slate-200">
               <td colSpan="5" className="px-6 py-2 text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2"><Info className="w-4 h-4" /> Obligaciones de Ley</td>
             </tr>
             {inmutables.map(item => (
-              <FilaGasto 
+              <FilaGasto
                 key={item.id} item={item} valorCalculado={item.valorQ1 + item.valorQ2}
                 q1_pagado={estadosInmutables[item.id]?.q1 || false}
                 q2_pagado={estadosInmutables[item.id]?.q2 || false}
@@ -217,7 +217,7 @@ export default function TablaGastos({ mesId, perfil, datos, isAlejandro, configu
               <td colSpan="5" className="px-6 py-2 text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2"><Info className="w-4 h-4" /> Gastos Fijos</td>
             </tr>
             {gastosFijos.map(gasto => (
-              <FilaGasto 
+              <FilaGasto
                 key={gasto.id} item={gasto}
                 q1_pagado={gasto.q1_pagado} q2_pagado={gasto.q2_pagado}
                 onToggleQ1={() => handleToggleFijo(gasto, 'q1', gasto.q1_pagado)}
@@ -230,7 +230,7 @@ export default function TablaGastos({ mesId, perfil, datos, isAlejandro, configu
               <td colSpan="5" className="px-6 py-2 text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2"><Info className="w-4 h-4" /> Gastos Variables (Mes en curso)</td>
             </tr>
             {gastosVariables.map(gasto => (
-              <FilaGasto 
+              <FilaGasto
                 key={gasto.id} item={gasto}
                 q1_pagado={gasto.q1_pagado} q2_pagado={gasto.q2_pagado}
                 onToggleQ1={() => handleToggleVariable(gasto, 'q1', gasto.q1_pagado)}
@@ -260,7 +260,7 @@ export default function TablaGastos({ mesId, perfil, datos, isAlejandro, configu
             <tr className="bg-slate-50 border-t-2 border-slate-200">
               <td colSpan="5" className="px-6 py-2 text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2"><Info className="w-4 h-4" /> Ahorro</td>
             </tr>
-            <FilaGasto 
+            <FilaGasto
               item={reserva}
               q1_pagado={reserva.q1_pagado} q2_pagado={reserva.q2_pagado}
               onToggleQ1={() => handleToggleReserva('q1', reserva.q1_pagado)}
@@ -269,7 +269,7 @@ export default function TablaGastos({ mesId, perfil, datos, isAlejandro, configu
             />
 
           </tbody>
-          
+
           {/* NUEVO DISEÑO DEL FOOTER CON EL DISPONIBLE */}
           <tfoot className="bg-slate-50 border-t-2 border-slate-200">
             <tr>
