@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Plus, Trash2, Check, X, Info } from 'lucide-react';
-import { doc, updateDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
+import { Plus, Trash2, Check, X, Info, Edit2 } from 'lucide-react';
+import { doc, updateDoc, arrayRemove } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 import { getWorkingDaysForMonth } from '../utils/dateUtils';
 
@@ -8,7 +8,14 @@ export default function TablaGastos({ mesId, perfil, datos, isAlejandro, configu
   const [isAdding, setIsAdding] = useState(false);
   const [nuevoNombre, setNuevoNombre] = useState('');
   const [nuevoValor, setNuevoValor] = useState('');
-  
+  const [nuevoMensual, setNuevoMensual] = useState(false);
+
+  const [editingId, setEditingId] = useState(null);
+  const [editingTipo, setEditingTipo] = useState(''); // 'gastos_fijos' | 'gastos_variables'
+  const [editNombre, setEditNombre] = useState('');
+  const [editValor, setEditValor] = useState('');
+  const [editMensual, setEditMensual] = useState(false);
+
   const [workingDays, setWorkingDays] = useState({ q1Days: 0, q2Days: 0 });
 
   const formatter = new Intl.NumberFormat('es-CO', {
@@ -38,7 +45,7 @@ export default function TablaGastos({ mesId, perfil, datos, isAlejandro, configu
   // 1. Cálculos de Inmutables
   const inmutables = useMemo(() => {
     const tarifaTransporte = isAlejandro ? (configuracion?.tarifa_integrado || 4715) * 2 : (configuracion?.tarifa_metro || 3820) * 2;
-    
+
     return [
       { id: 'diezmo', nombre: 'Diezmo (10%)', valorQ1: (totalIngresosFijos * 0.1) / 2, valorQ2: (totalIngresosFijos * 0.1) / 2, inmutable: true },
       { id: 'salud', nombre: 'Salud (4%)', valorQ1: (totalIngresosFijos * 0.04) / 2, valorQ2: (totalIngresosFijos * 0.04) / 2, inmutable: true },
@@ -68,33 +75,18 @@ export default function TablaGastos({ mesId, perfil, datos, isAlejandro, configu
     }
   };
 
-  const handleToggleFijo = async (gasto, quincena, currentState) => {
-    const arrayActual = [...gastosFijos];
+  const handleToggleGasto = async (gasto, tipoArray, quincena, currentState) => {
+    const arrayActual = tipoArray === 'gastos_fijos' ? [...gastosFijos] : [...gastosVariables];
     const index = arrayActual.findIndex(g => g.id === gasto.id);
     if (index === -1) return;
 
     arrayActual[index] = { ...arrayActual[index], [quincena === 'q1' ? 'q1_pagado' : 'q2_pagado']: !currentState };
     const docRef = doc(db, 'presupuestos', mesId);
-    const updateField = isAlejandro ? 'alejandro.gastos_fijos' : 'esposa.gastos_fijos';
+    const updateField = isAlejandro ? `alejandro.${tipoArray}` : `esposa.${tipoArray}`;
     try {
       await updateDoc(docRef, { [updateField]: arrayActual });
     } catch (error) {
-      console.error("Error updating fijo state", error);
-    }
-  };
-
-  const handleToggleVariable = async (gasto, quincena, currentState) => {
-    const arrayActual = [...gastosVariables];
-    const index = arrayActual.findIndex(g => g.id === gasto.id);
-    if (index === -1) return;
-
-    arrayActual[index] = { ...arrayActual[index], [quincena === 'q1' ? 'q1_pagado' : 'q2_pagado']: !currentState };
-    const docRef = doc(db, 'presupuestos', mesId);
-    const updateField = isAlejandro ? 'alejandro.gastos_variables' : 'esposa.gastos_variables';
-    try {
-      await updateDoc(docRef, { [updateField]: arrayActual });
-    } catch (error) {
-      console.error("Error updating variable state", error);
+      console.error("Error updating gasto state", error);
     }
   };
 
@@ -111,25 +103,70 @@ export default function TablaGastos({ mesId, perfil, datos, isAlejandro, configu
   const handleAddVariable = async () => {
     if (!nuevoNombre || !nuevoValor) return;
     const newGasto = { id: `var_${Date.now()}`, nombre: nuevoNombre, valor: Number(nuevoValor), q1_pagado: false, q2_pagado: false };
+    
+    const arrayActual = [...gastosVariables, newGasto];
     const docRef = doc(db, 'presupuestos', mesId);
     const updateField = isAlejandro ? 'alejandro.gastos_variables' : 'esposa.gastos_variables';
+    
     try {
-      await updateDoc(docRef, { [updateField]: arrayUnion(newGasto) });
+      await updateDoc(docRef, { [updateField]: arrayActual });
+      
+      if (nuevoMensual) {
+        const plantillaRef = doc(db, 'plantillas', 'plantilla_base');
+        await updateDoc(plantillaRef, { [updateField]: arrayActual });
+      }
+
       setIsAdding(false);
       setNuevoNombre('');
       setNuevoValor('');
+      setNuevoMensual(false);
     } catch (error) {
       console.error("Error adding variable gasto", error);
     }
   };
 
-  const handleDeleteVariable = async (gasto) => {
+  const handleDeleteGasto = async (gasto, tipoArray) => {
     const docRef = doc(db, 'presupuestos', mesId);
-    const updateField = isAlejandro ? 'alejandro.gastos_variables' : 'esposa.gastos_variables';
+    const updateField = isAlejandro ? `alejandro.${tipoArray}` : `esposa.${tipoArray}`;
     try {
-      await updateDoc(docRef, { [updateField]: arrayRemove(gasto) });
+      const arrayActual = (tipoArray === 'gastos_fijos' ? gastosFijos : gastosVariables).filter(g => g.id !== gasto.id);
+      await updateDoc(docRef, { [updateField]: arrayActual });
     } catch (error) {
-      console.error("Error deleting variable gasto", error);
+      console.error("Error deleting gasto", error);
+    }
+  };
+
+  const handleStartEdit = (gasto, tipoArray) => {
+    setEditingId(gasto.id);
+    setEditingTipo(tipoArray);
+    setEditNombre(gasto.nombre);
+    setEditValor(gasto.valor);
+    setEditMensual(false);
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editNombre || !editValor) return;
+
+    const arrayActual = editingTipo === 'gastos_fijos' ? [...gastosFijos] : [...gastosVariables];
+    const index = arrayActual.findIndex(g => g.id === editingId);
+    if (index === -1) return;
+
+    arrayActual[index] = { ...arrayActual[index], nombre: editNombre, valor: Number(editValor) };
+
+    const docRef = doc(db, 'presupuestos', mesId);
+    const updateField = isAlejandro ? `alejandro.${editingTipo}` : `esposa.${editingTipo}`;
+
+    try {
+      await updateDoc(docRef, { [updateField]: arrayActual });
+
+      if (editMensual) {
+        const plantillaRef = doc(db, 'plantillas', 'plantilla_base');
+        await updateDoc(plantillaRef, { [updateField]: arrayActual });
+      }
+
+      setEditingId(null);
+    } catch (error) {
+      console.error("Error saving edit", error);
     }
   };
 
@@ -138,42 +175,70 @@ export default function TablaGastos({ mesId, perfil, datos, isAlejandro, configu
   const totalFijos = gastosFijos.reduce((sum, item) => sum + (Number(item.valor) || 0), 0);
   const totalVariables = gastosVariables.reduce((sum, item) => sum + (Number(item.valor) || 0), 0);
   const granTotal = totalInmutables + totalFijos + totalVariables + (Number(reserva.valor) || 0);
-  
+
   // Métrica visual que solicitaste
   const disponible = totalIngresos - granTotal;
 
   // Componente de Fila Reutilizable
-  const FilaGasto = ({ item, valorCalculado, q1_pagado, q2_pagado, onToggleQ1, onToggleQ2, onDelete, isAuto, isReserva }) => (
-    <tr className="hover:bg-slate-50 transition-colors">
-      <td className="px-6 py-4 font-medium text-slate-700">
-        {item.nombre}
-        {isReserva && <span className="ml-2 text-[10px] bg-brand-100 text-brand-700 px-2 py-0.5 rounded-full uppercase font-bold">Reserva</span>}
-      </td>
-      <td className="px-6 py-4 text-right font-semibold text-slate-800">
-        {formatter.format(valorCalculado || item.valor)}
-      </td>
-      <td className="px-6 py-4 text-center">
-        <label className="inline-flex items-center gap-2 cursor-pointer group">
-          <input type="checkbox" checked={q1_pagado} onChange={onToggleQ1} className="w-5 h-5 rounded border-slate-300 text-rose-500 focus:ring-rose-500 cursor-pointer" />
-          <span className={`text-slate-600 transition-all ${q1_pagado ? 'line-through text-slate-400 opacity-50' : ''}`}>
-            {formatter.format(item.valorQ1 || (item.valor / 2))}
-          </span>
-        </label>
-      </td>
-      <td className="px-6 py-4 text-center">
-        <label className="inline-flex items-center gap-2 cursor-pointer group">
-          <input type="checkbox" checked={q2_pagado} onChange={onToggleQ2} className="w-5 h-5 rounded border-slate-300 text-rose-500 focus:ring-rose-500 cursor-pointer" />
-          <span className={`text-slate-600 transition-all ${q2_pagado ? 'line-through text-slate-400 opacity-50' : ''}`}>
-            {formatter.format(item.valorQ2 || (item.valor / 2))}
-          </span>
-        </label>
-      </td>
-      <td className="px-6 py-4 text-center">
-        {isAuto ? <span className="text-xs text-slate-400 italic">Auto</span> : 
-         onDelete ? <button onClick={onDelete} className="p-1 text-slate-400 hover:text-rose-500 transition-colors"><Trash2 className="w-4 h-4" /></button> : null}
-      </td>
-    </tr>
-  );
+  const FilaGasto = ({ item, valorCalculado, q1_pagado, q2_pagado, onToggleQ1, onToggleQ2, onDelete, onEdit, isAuto, isReserva }) => {
+    if (editingId === item.id) {
+      return (
+        <tr className="bg-rose-50">
+          <td className="px-6 py-4">
+            <input type="text" className="w-full border-slate-300 rounded p-1 text-sm focus:ring-rose-500" value={editNombre} onChange={(e) => setEditNombre(e.target.value)} />
+          </td>
+          <td className="px-6 py-4">
+            <input type="number" className="w-full border-slate-300 rounded p-1 text-sm text-right focus:ring-rose-500" value={editValor} onChange={(e) => setEditValor(e.target.value)} />
+            <label className="flex items-center justify-end gap-1 mt-1 text-[10px] text-slate-500 cursor-pointer">
+              <input type="checkbox" className="rounded text-rose-500 w-3 h-3" checked={editMensual} onChange={(e) => setEditMensual(e.target.checked)} /> Mensual
+            </label>
+          </td>
+          <td className="px-6 py-4 text-center text-slate-400 text-xs">Calc...</td>
+          <td className="px-6 py-4 text-center text-slate-400 text-xs">Calc...</td>
+          <td className="px-6 py-4 flex justify-center gap-2">
+            <button onClick={handleSaveEdit} className="p-1 text-green-600 hover:bg-green-100 rounded"><Check className="w-4 h-4" /></button>
+            <button onClick={() => setEditingId(null)} className="p-1 text-slate-500 hover:bg-slate-200 rounded"><X className="w-4 h-4" /></button>
+          </td>
+        </tr>
+      );
+    }
+
+    return (
+      <tr className="hover:bg-slate-50 transition-colors">
+        <td className="px-6 py-4 font-medium text-slate-700">
+          {item.nombre}
+          {isReserva && <span className="ml-2 text-[10px] bg-brand-100 text-brand-700 px-2 py-0.5 rounded-full uppercase font-bold">Reserva</span>}
+        </td>
+        <td className="px-6 py-4 text-right font-semibold text-slate-800">
+          {formatter.format(valorCalculado || item.valor)}
+        </td>
+        <td className="px-6 py-4 text-center">
+          <label className="inline-flex items-center gap-2 cursor-pointer group">
+            <input type="checkbox" checked={q1_pagado} onChange={onToggleQ1} className="w-5 h-5 rounded border-slate-300 text-rose-500 focus:ring-rose-500 cursor-pointer" />
+            <span className={`text-slate-600 transition-all ${q1_pagado ? 'line-through text-slate-400 opacity-50' : ''}`}>
+              {formatter.format(item.valorQ1 || (item.valor / 2))}
+            </span>
+          </label>
+        </td>
+        <td className="px-6 py-4 text-center">
+          <label className="inline-flex items-center gap-2 cursor-pointer group">
+            <input type="checkbox" checked={q2_pagado} onChange={onToggleQ2} className="w-5 h-5 rounded border-slate-300 text-rose-500 focus:ring-rose-500 cursor-pointer" />
+            <span className={`text-slate-600 transition-all ${q2_pagado ? 'line-through text-slate-400 opacity-50' : ''}`}>
+              {formatter.format(item.valorQ2 || (item.valor / 2))}
+            </span>
+          </label>
+        </td>
+        <td className="px-6 py-4 text-center">
+          {isAuto || isReserva ? <span className="text-xs text-slate-400 italic">Auto</span> : (
+            <div className="flex items-center justify-center gap-2">
+              {onEdit && <button onClick={onEdit} className="p-1 text-slate-400 hover:text-brand-500 transition-colors"><Edit2 className="w-3 h-3" /></button>}
+              {onDelete && <button onClick={onDelete} className="p-1 text-slate-400 hover:text-rose-500 transition-colors"><Trash2 className="w-4 h-4" /></button>}
+            </div>
+          )}
+        </td>
+      </tr>
+    );
+  };
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden mb-6">
@@ -196,13 +261,13 @@ export default function TablaGastos({ mesId, perfil, datos, isAlejandro, configu
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-200 text-sm">
-            
+
             {/* SECCIÓN 1: INMUTABLES */}
             <tr className="bg-slate-50 border-t-2 border-slate-200">
               <td colSpan="5" className="px-6 py-2 text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2"><Info className="w-4 h-4" /> Obligaciones de Ley</td>
             </tr>
             {inmutables.map(item => (
-              <FilaGasto 
+              <FilaGasto
                 key={item.id} item={item} valorCalculado={item.valorQ1 + item.valorQ2}
                 q1_pagado={estadosInmutables[item.id]?.q1 || false}
                 q2_pagado={estadosInmutables[item.id]?.q2 || false}
@@ -217,11 +282,13 @@ export default function TablaGastos({ mesId, perfil, datos, isAlejandro, configu
               <td colSpan="5" className="px-6 py-2 text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2"><Info className="w-4 h-4" /> Gastos Fijos</td>
             </tr>
             {gastosFijos.map(gasto => (
-              <FilaGasto 
+              <FilaGasto
                 key={gasto.id} item={gasto}
                 q1_pagado={gasto.q1_pagado} q2_pagado={gasto.q2_pagado}
-                onToggleQ1={() => handleToggleFijo(gasto, 'q1', gasto.q1_pagado)}
-                onToggleQ2={() => handleToggleFijo(gasto, 'q2', gasto.q2_pagado)}
+                onToggleQ1={() => handleToggleGasto(gasto, 'gastos_fijos', 'q1', gasto.q1_pagado)}
+                onToggleQ2={() => handleToggleGasto(gasto, 'gastos_fijos', 'q2', gasto.q2_pagado)}
+                onEdit={() => handleStartEdit(gasto, 'gastos_fijos')}
+                onDelete={() => handleDeleteGasto(gasto, 'gastos_fijos')}
               />
             ))}
 
@@ -230,19 +297,25 @@ export default function TablaGastos({ mesId, perfil, datos, isAlejandro, configu
               <td colSpan="5" className="px-6 py-2 text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2"><Info className="w-4 h-4" /> Gastos Variables (Mes en curso)</td>
             </tr>
             {gastosVariables.map(gasto => (
-              <FilaGasto 
+              <FilaGasto
                 key={gasto.id} item={gasto}
                 q1_pagado={gasto.q1_pagado} q2_pagado={gasto.q2_pagado}
-                onToggleQ1={() => handleToggleVariable(gasto, 'q1', gasto.q1_pagado)}
-                onToggleQ2={() => handleToggleVariable(gasto, 'q2', gasto.q2_pagado)}
-                onDelete={() => handleDeleteVariable(gasto)}
+                onToggleQ1={() => handleToggleGasto(gasto, 'gastos_variables', 'q1', gasto.q1_pagado)}
+                onToggleQ2={() => handleToggleGasto(gasto, 'gastos_variables', 'q2', gasto.q2_pagado)}
+                onEdit={() => handleStartEdit(gasto, 'gastos_variables')}
+                onDelete={() => handleDeleteGasto(gasto, 'gastos_variables')}
               />
             ))}
 
             {isAdding && (
               <tr className="bg-rose-50">
                 <td className="px-6 py-4"><input type="text" placeholder="Ej. Regalo" className="w-full border-slate-300 rounded p-1 text-sm focus:ring-rose-500" value={nuevoNombre} onChange={(e) => setNuevoNombre(e.target.value)} /></td>
-                <td className="px-6 py-4"><input type="number" placeholder="Valor" className="w-full border-slate-300 rounded p-1 text-sm text-right focus:ring-rose-500" value={nuevoValor} onChange={(e) => setNuevoValor(e.target.value)} /></td>
+                <td className="px-6 py-4">
+                  <input type="number" placeholder="Valor" className="w-full border-slate-300 rounded p-1 text-sm text-right focus:ring-rose-500" value={nuevoValor} onChange={(e) => setNuevoValor(e.target.value)} />
+                  <label className="flex items-center justify-end gap-1 mt-1 text-[10px] text-slate-500 cursor-pointer">
+                    <input type="checkbox" className="rounded text-rose-500 w-3 h-3" checked={nuevoMensual} onChange={(e) => setNuevoMensual(e.target.checked)} /> Mensual
+                  </label>
+                </td>
                 <td className="px-6 py-4 text-center text-slate-400 text-xs">Calc...</td>
                 <td className="px-6 py-4 text-center text-slate-400 text-xs">Calc...</td>
                 <td className="px-6 py-4 flex justify-center gap-2">
@@ -260,7 +333,7 @@ export default function TablaGastos({ mesId, perfil, datos, isAlejandro, configu
             <tr className="bg-slate-50 border-t-2 border-slate-200">
               <td colSpan="5" className="px-6 py-2 text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2"><Info className="w-4 h-4" /> Ahorro</td>
             </tr>
-            <FilaGasto 
+            <FilaGasto
               item={reserva}
               q1_pagado={reserva.q1_pagado} q2_pagado={reserva.q2_pagado}
               onToggleQ1={() => handleToggleReserva('q1', reserva.q1_pagado)}
@@ -269,7 +342,7 @@ export default function TablaGastos({ mesId, perfil, datos, isAlejandro, configu
             />
 
           </tbody>
-          
+
           {/* NUEVO DISEÑO DEL FOOTER CON EL DISPONIBLE */}
           <tfoot className="bg-slate-50 border-t-2 border-slate-200">
             <tr>
