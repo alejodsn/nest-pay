@@ -1,4 +1,15 @@
-export const DEFAULT_MONTH = '2026-08';
+// Función que lee el reloj del sistema y genera el formato "YYYY-MM"
+const getCurrentMonth = () => {
+  const date = new Date();
+  const year = date.getFullYear();
+  // Se suma 1 porque en JavaScript los meses van de 0 (Enero) a 11 (Diciembre)
+  // El padStart asegura que meses como Septiembre (9) queden como "09"
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  return `${year}-${month}`;
+};
+
+// Exportamos el mes dinámico en lugar de dejarlo quemado
+export const DEFAULT_MONTH = getCurrentMonth();
 
 // Esta variable ahora funciona solo como un "salvavidas" inicial.
 // Una vez que se inyecte en Firebase, la app dejará de usar esto y leerá directo de la BD.
