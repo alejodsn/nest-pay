@@ -33,8 +33,8 @@ const INITIAL_DATA = {
       { id: "f6", nombre: "Alkomprar iPhone", valor: 77000, q1_pagado: false, q2_pagado: false },
       { id: "f7", nombre: "Google One", valor: 65000, q1_pagado: false, q2_pagado: false },
       { id: "f8", nombre: "iCloud", valor: 15000, q1_pagado: false, q2_pagado: false },
-      { id: "f9", nombre: "Adobe", valor: 65000, q1_pagado: false, q2_pagado: false }
-      { id: "f10", nombre: "Davivienda", valor: 0, q1_pagado: false, q2_pagado: false }
+      { id: "f9", nombre: "Adobe", valor: 65000, q1_pagado: false, q2_pagado: false },
+      { id: "f10", nombre: "Davivienda", valor: 0, q1_pagado: false, q2_pagado: false },
       { id: "f11", nombre: "Remodelación", valor: 0, q1_pagado: false, q2_pagado: false }
     ],
     gastos_variables: [],
