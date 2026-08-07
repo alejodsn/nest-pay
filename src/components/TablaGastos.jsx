@@ -23,6 +23,13 @@ export default function TablaGastos({ mesId, perfil, datos, isAlejandro, configu
     }
   }, [mesId]);
 
+  // Cálculo de TODOS los ingresos (para el Disponible)
+  const totalIngresos = useMemo(() => {
+    const ingresos = datos?.ingresos || [];
+    return ingresos.reduce((sum, item) => sum + (Number(item.valor) || 0), 0);
+  }, [datos?.ingresos]);
+
+  // Cálculo solo de Ingresos Fijos (para la matemática de los Inmutables de Ley)
   const totalIngresosFijos = useMemo(() => {
     const ingresos = datos?.ingresos || [];
     return ingresos.filter(i => i.fijo).reduce((sum, item) => sum + (Number(item.valor) || 0), 0);
@@ -126,11 +133,14 @@ export default function TablaGastos({ mesId, perfil, datos, isAlejandro, configu
     }
   };
 
-  // Cálculo de totales
+  // Cálculo de totales y Disponible
   const totalInmutables = inmutables.reduce((sum, item) => sum + item.valorQ1 + item.valorQ2, 0);
   const totalFijos = gastosFijos.reduce((sum, item) => sum + (Number(item.valor) || 0), 0);
   const totalVariables = gastosVariables.reduce((sum, item) => sum + (Number(item.valor) || 0), 0);
   const granTotal = totalInmutables + totalFijos + totalVariables + (Number(reserva.valor) || 0);
+  
+  // Métrica visual que solicitaste
+  const disponible = totalIngresos - granTotal;
 
   // Componente de Fila Reutilizable
   const FilaGasto = ({ item, valorCalculado, q1_pagado, q2_pagado, onToggleQ1, onToggleQ2, onDelete, isAuto, isReserva }) => (
@@ -259,13 +269,27 @@ export default function TablaGastos({ mesId, perfil, datos, isAlejandro, configu
             />
 
           </tbody>
-          <tfoot className="bg-slate-50">
+          
+          {/* NUEVO DISEÑO DEL FOOTER CON EL DISPONIBLE */}
+          <tfoot className="bg-slate-50 border-t-2 border-slate-200">
             <tr>
-              <td className="px-6 py-4 text-right font-bold text-slate-700">Total Gastos:</td>
-              <td className="px-6 py-4 text-right font-bold text-rose-600 text-lg">
-                {formatter.format(granTotal)}
+              <td colSpan="5" className="px-6 py-6">
+                <div className="flex flex-col sm:flex-row justify-end items-end sm:items-center gap-8">
+                  <div className="flex flex-col text-right">
+                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Total Gastos</span>
+                    <span className="text-xl font-bold text-rose-600">
+                      {formatter.format(granTotal)}
+                    </span>
+                  </div>
+                  <div className="h-10 w-px bg-slate-300 hidden sm:block"></div>
+                  <div className="flex flex-col text-right">
+                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Disponible</span>
+                    <span className={`text-2xl font-black ${disponible >= 0 ? 'text-emerald-500' : 'text-rose-600'}`}>
+                      {formatter.format(disponible)}
+                    </span>
+                  </div>
+                </div>
               </td>
-              <td colSpan="3"></td>
             </tr>
           </tfoot>
         </table>
