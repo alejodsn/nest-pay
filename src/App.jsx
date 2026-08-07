@@ -14,13 +14,29 @@ const INITIAL_DATA = {
   mes: DEFAULT_MONTH,
   configuracion: {
     presupuesto_mercado: 1500000,
-    tarifa_integrado: 10000,
-    tarifa_metro: 3600
+    tarifa_integrado: 4715,
+    tarifa_metro: 3820
   },
   alejandro: {
     reserva_acumulada: 0,
-    ingresos: [{ id: "1", nombre: "Salario", valor: 3000000, fijo: true }],
-    gastos_variables: [{ id: "g1", nombre: "Reserva Mensual", valor: 50000, q1_pagado: false, q2_pagado: false }],
+    ingresos: [
+      { id: "i1", nombre: "Salario", valor: 3000000, fijo: true },
+      { id: "i2", nombre: "Aux. Trans.", valor: 249095, fijo: true },
+      { id: "i3", nombre: "Milenio", valor: 1034000, fijo: true }
+    ],
+    gastos_fijos: [
+      { id: "f1", nombre: "Mercado", valor: 1500000, q1_pagado: false, q2_pagado: false },
+      { id: "f2", nombre: "Internet+Datos", valor: 120000, q1_pagado: false, q2_pagado: false },
+      { id: "f3", nombre: "Crédito Camilo", valor: 300000, q1_pagado: false, q2_pagado: false },
+      { id: "f4", nombre: "Corte Mateo", valor: 60000, q1_pagado: false, q2_pagado: false },
+      { id: "f5", nombre: "Transportes Domingo", valor: 120000, q1_pagado: false, q2_pagado: false },
+      { id: "f6", nombre: "Alkomprar iPhone", valor: 77000, q1_pagado: false, q2_pagado: false },
+      { id: "f7", nombre: "Google One", valor: 65000, q1_pagado: false, q2_pagado: false },
+      { id: "f8", nombre: "iCloud", valor: 15000, q1_pagado: false, q2_pagado: false },
+      { id: "f9", nombre: "Adobe", valor: 65000, q1_pagado: false, q2_pagado: false }
+    ],
+    gastos_variables: [],
+    reserva: { nombre: "Reserva Mensual", valor: 200000, q1_pagado: false, q2_pagado: false },
     mercado_tickets: [],
     estado_pagos_inmutables: {
       diezmo: { q1: false, q2: false },
@@ -31,8 +47,25 @@ const INITIAL_DATA = {
   },
   esposa: {
     reserva_acumulada: 0,
-    ingresos: [{ id: "2", nombre: "Salario", valor: 2000000, fijo: true }],
-    gastos_variables: [{ id: "g2", nombre: "Celular", valor: 45000, q1_pagado: false, q2_pagado: false }],
+    ingresos: [
+      { id: "i1", nombre: "Salario", valor: 3700000, fijo: true }
+    ],
+    gastos_fijos: [
+      { id: "e1", nombre: "Crédito Milenio", valor: 460000, q1_pagado: false, q2_pagado: false },
+      { id: "e2", nombre: "Deducciones Milenio", valor: 214000, q1_pagado: false, q2_pagado: false },
+      { id: "e3", nombre: "Celular claro", valor: 50000, q1_pagado: false, q2_pagado: false },
+      { id: "e4", nombre: "Emi Blanca", valor: 70000, q1_pagado: false, q2_pagado: false },
+      { id: "e5", nombre: "Natillera", valor: 65000, q1_pagado: false, q2_pagado: false },
+      { id: "e6", nombre: "Uñas", valor: 60000, q1_pagado: false, q2_pagado: false },
+      { id: "e7", nombre: "Leche Mateo", valor: 75000, q1_pagado: false, q2_pagado: false },
+      { id: "e8", nombre: "Arriendo", valor: 700000, q1_pagado: false, q2_pagado: false },
+      { id: "e9", nombre: "Servicios", valor: 210000, q1_pagado: false, q2_pagado: false },
+      { id: "e10", nombre: "Cuidado Mateo", valor: 150000, q1_pagado: false, q2_pagado: false },
+      { id: "e11", nombre: "Jardín", valor: 350000, q1_pagado: false, q2_pagado: false },
+      { id: "e12", nombre: "Escuela de futbol", valor: 70000, q1_pagado: false, q2_pagado: false }
+    ],
+    gastos_variables: [],
+    reserva: { nombre: "Reserva Mensual", valor: 50000, q1_pagado: false, q2_pagado: false },
     estado_pagos_inmutables: {
       diezmo: { q1: false, q2: false },
       salud: { q1: false, q2: false },
@@ -43,15 +76,13 @@ const INITIAL_DATA = {
 };
 
 export default function App() {
-  const [perfilActivo, setPerfilActivo] = useState('alejandro'); // 'alejandro' | 'esposa'
+  const [perfilActivo, setPerfilActivo] = useState('alejandro');
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Inicializar o escuchar el documento
     const docRef = doc(db, 'presupuestos', DEFAULT_MONTH);
     
-    // Función para inicializar si no existe
     const initDoc = async () => {
       try {
         const docSnap = await getDoc(docRef);
@@ -64,7 +95,6 @@ export default function App() {
     };
 
     initDoc().then(() => {
-      // Suscribirse a cambios
       const unsubscribe = onSnapshot(docRef, (docSnap) => {
         if (docSnap.exists()) {
           setData(docSnap.data());
@@ -92,49 +122,58 @@ export default function App() {
   const perfilData = isAle ? data?.alejandro : data?.esposa;
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8">
-      {/* Header Fijo */}
-      <header className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 bg-brand-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-brand-200">
-            <PiggyBank className="w-7 h-7" />
+    <div className="w-full px-4 py-6">
+      
+      {/* Header Unificado */}
+      <header className="mb-6 flex flex-col xl:flex-row xl:items-center justify-between gap-4 bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+        
+        <div className="flex flex-wrap items-center gap-6">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-brand-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-brand-200">
+              <PiggyBank className="w-6 h-6" />
+            </div>
+            
+            <select 
+              className="text-xl font-extrabold text-slate-800 bg-transparent border-none cursor-pointer focus:ring-0 outline-none"
+              value={DEFAULT_MONTH}
+              onChange={(e) => {
+                console.log("Cargar mes:", e.target.value);
+              }}
+            >
+              <option value="2026-07">Julio 2026</option>
+              <option value="2026-08">Agosto 2026 (Actual)</option>
+              <option value="2026-09">Septiembre 2026</option>
+            </select>
           </div>
-          <div>
-            <h1 className="text-2xl font-extrabold text-slate-800 tracking-tight">Familia Financiera</h1>
-            <p className="text-sm font-medium text-slate-500">Presupuesto: Agosto 2026</p>
+
+          <div className="flex bg-slate-100 p-1 rounded-lg">
+            <button
+              onClick={() => setPerfilActivo('alejandro')}
+              className={`flex items-center gap-2 px-5 py-1.5 rounded-md font-bold text-sm transition-all ${
+                isAle ? 'bg-white text-brand-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'
+              }`}
+            >
+              <UserCircle2 className="w-5 h-5" /> Alejandro
+            </button>
+            <button
+              onClick={() => setPerfilActivo('esposa')}
+              className={`flex items-center gap-2 px-5 py-1.5 rounded-md font-bold text-sm transition-all ${
+                !isAle ? 'bg-white text-rose-500 shadow-sm' : 'text-slate-500 hover:text-slate-700'
+              }`}
+            >
+              <UserCircle2 className="w-5 h-5" /> Esposa
+            </button>
           </div>
+        </div>
+
+        <div className="flex-shrink-0 w-full xl:w-auto">
+          <ResumenGlobal data={data} />
         </div>
       </header>
 
-      {/* Resumen Global */}
-      <ResumenGlobal data={data} />
-
-      {/* Selector de Perfiles */}
-      <div className="flex justify-center mb-8">
-        <div className="bg-slate-200 p-1 rounded-xl flex gap-1 shadow-inner">
-          <button
-            onClick={() => setPerfilActivo('alejandro')}
-            className={`flex items-center gap-2 px-6 py-2.5 rounded-lg font-bold text-sm transition-all duration-300 ${
-              isAle ? 'bg-white text-brand-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'
-            }`}
-          >
-            <UserCircle2 className="w-5 h-5" /> Alejandro
-          </button>
-          <button
-            onClick={() => setPerfilActivo('esposa')}
-            className={`flex items-center gap-2 px-6 py-2.5 rounded-lg font-bold text-sm transition-all duration-300 ${
-              !isAle ? 'bg-white text-rose-500 shadow-sm' : 'text-slate-500 hover:text-slate-700'
-            }`}
-          >
-            <UserCircle2 className="w-5 h-5" /> Esposa
-          </button>
-        </div>
-      </div>
-
-      {/* Contenido Dinámico por Perfil */}
+      {/* Contenido Dinámico */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 animate-fade-in">
         
-        {/* Columna Izquierda: Ingresos y Mercado (Si es Ale) */}
         <div className="lg:col-span-5 flex flex-col gap-6">
           <TablaIngresos 
             mesId={DEFAULT_MONTH} 
@@ -151,7 +190,6 @@ export default function App() {
           )}
         </div>
 
-        {/* Columna Derecha: Gastos */}
         <div className="lg:col-span-7">
           <TablaGastos 
             mesId={DEFAULT_MONTH}
