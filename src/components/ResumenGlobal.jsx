@@ -1,40 +1,62 @@
-import React, { useMemo } from 'react';
-import { Wallet, TrendingDown, PiggyBank } from 'lucide-react';
+import React, { useMemo, useState, useEffect } from 'react';
+import { Wallet, TrendingDown } from 'lucide-react';
+import { getWorkingDaysForMonth } from '../utils/dateUtils';
 
-export default function ResumenGlobal({ data }) {
+export default function ResumenGlobal({ data, mesSeleccionado }) {
+  const [workingDays, setWorkingDays] = useState({ q1Days: 0, q2Days: 0 });
+
+  useEffect(() => {
+    if (mesSeleccionado) {
+      getWorkingDaysForMonth(mesSeleccionado).then(days => setWorkingDays(days));
+    }
+  }, [mesSeleccionado]);
+
   const sumItems = (items = []) => items.reduce((acc, item) => acc + (Number(item.valor) || 0), 0);
 
   const stats = useMemo(() => {
     if (!data) return { ingresosTotales: 0, gastosTotales: 0 };
 
-    const ingresosAlejandro = sumItems(data.alejandro?.ingresos);
-    const ingresosEsposa = sumItems(data.esposa?.ingresos);
-    
-    // Inmutables (aproximación basada en fijos)
-    const fijosAle = data.alejandro?.ingresos?.filter(i => i.fijo) || [];
-    const fijosEsp = data.esposa?.ingresos?.filter(i => i.fijo) || [];
-    const baseAle = sumItems(fijosAle);
-    const baseEsp = sumItems(fijosEsp);
-    
-    // Para simplificar el resumen global, el gasto total solo sumará variables.
-    // Los inmutables varían por transporte, que es asíncrono y se calcula en TablaGastos. 
-    // Para mantener el resumen ágil, sumamos los fijos estándar y variables.
-    const inmutablesFijosAle = (baseAle * 0.1) + (baseAle * 0.04) + (baseAle * 0.04);
-    const inmutablesFijosEsp = (baseEsp * 0.1) + (baseEsp * 0.04) + (baseEsp * 0.04);
+    const calcPerfil = (perfilData, isAlejandro) => {
+      if (!perfilData) return { ingresos: 0, gastos: 0 };
 
-    const gastosVariablesAle = sumItems(data.alejandro?.gastos_variables);
-    const gastosVariablesEsp = sumItems(data.esposa?.gastos_variables);
+      const ingresosTotales = sumItems(perfilData.ingresos);
+      
+      const ingresosFijos = perfilData.ingresos?.filter(i => i.fijo) || [];
+      const totalIngresosFijos = sumItems(ingresosFijos);
 
-    const mercadoGastado = data.alejandro?.mercado_tickets?.reduce((acc, t) => acc + (Number(t.valor) || 0), 0) || 0;
+      // Inmutables
+      const configuracion = data.configuracion || {};
+      const tarifaTransporte = isAlejandro 
+        ? (configuracion.tarifa_integrado || 4715) * 2 
+        : (configuracion.tarifa_metro || 3820) * 2;
+      
+      const totalTransporte = (workingDays.q1Days + workingDays.q2Days) * tarifaTransporte;
+      const totalDiezmo = totalIngresosFijos * 0.10;
+      const totalSalud = totalIngresosFijos * 0.04;
+      const totalPension = totalIngresosFijos * 0.04;
+      const totalInmutables = totalDiezmo + totalSalud + totalPension + totalTransporte;
 
-    // Nota: El transporte requiere un cálculo asíncrono que no está disponible instantáneamente aquí.
-    // Para ser precisos tendríamos que pasar los valores calculados de transporte a este componente.
-    // De momento, sumaremos los gastos conocidos.
-    const ingresosTotales = ingresosAlejandro + ingresosEsposa;
-    const gastosTotales = inmutablesFijosAle + inmutablesFijosEsp + gastosVariablesAle + gastosVariablesEsp + mercadoGastado;
+      // Gastos Fijos, Variables y Reservas
+      const totalFijos = sumItems(perfilData.gastos_fijos);
+      const totalVariables = sumItems(perfilData.gastos_variables);
+      const totalReserva = Number(perfilData.reserva?.valor) || 0;
+      
+      // Mercado Tickets (solo si aplica)
+      const mercadoGastado = perfilData.mercado_tickets?.reduce((acc, t) => acc + (Number(t.valor) || 0), 0) || 0;
 
-    return { ingresosTotales, gastosTotales };
-  }, [data]);
+      const gastosTotales = totalInmutables + totalFijos + totalVariables + totalReserva + mercadoGastado;
+
+      return { ingresos: ingresosTotales, gastos: gastosTotales };
+    };
+
+    const aleStats = calcPerfil(data.alejandro, true);
+    const espStats = calcPerfil(data.esposa, false);
+
+    return {
+      ingresosTotales: aleStats.ingresos + espStats.ingresos,
+      gastosTotales: aleStats.gastos + espStats.gastos
+    };
+  }, [data, workingDays]);
 
   const formatter = new Intl.NumberFormat('es-CO', {
     style: 'currency',
@@ -43,7 +65,7 @@ export default function ResumenGlobal({ data }) {
   });
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4 mb-6 flex flex-col md:flex-row gap-4 justify-around items-center">
+    <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4 flex flex-col md:flex-row gap-6 justify-around items-center">
       <div className="flex items-center gap-3">
         <div className="p-3 bg-green-100 text-green-600 rounded-lg">
           <Wallet className="w-6 h-6" />
@@ -61,7 +83,7 @@ export default function ResumenGlobal({ data }) {
           <TrendingDown className="w-6 h-6" />
         </div>
         <div>
-          <p className="text-sm text-slate-500 font-medium">Gastos Totales (Aprox sin Transporte)</p>
+          <p className="text-sm text-slate-500 font-medium">Gastos Totales</p>
           <p className="text-2xl font-bold text-slate-800">{formatter.format(stats.gastosTotales)}</p>
         </div>
       </div>
