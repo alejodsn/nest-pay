@@ -11,7 +11,7 @@ export default function BentoCard({
 }) {
   return (
     <div 
-      className={`relative w-full bg-surface border border-white/[0.08] backdrop-blur-xl rounded-3xl p-6 shadow-xl transition-all duration-300 flex flex-col justify-between ${className}`}
+      className={`relative w-full bg-surface border border-white/[0.08] backdrop-blur-xl rounded-3xl p-6 shadow-xl transition-all duration-300 flex flex-col justify-between transform-gpu translate-z-0 will-change-transform ${className}`}
       style={{ isolation: 'isolate', contain: 'paint' }}
     >
       
