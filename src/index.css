@@ -18,7 +18,7 @@
     --color-surface-hover: rgba(255, 255, 255, 0.07);
     --color-border: rgba(255, 255, 255, 0.08);
     --color-text-main: rgba(255, 255, 255, 0.95);
-    --color-text-muted: #94A3B8;
+    --color-text-muted: rgba(148, 163, 184, 0.8);
   }
 
   body {
