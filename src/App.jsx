@@ -245,8 +245,8 @@ export default function App() {
             </BentoCard>
           </div>
 
-          {/* 4. BALANCE OPERATIVO */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
+          {/* 4. GRID MAESTRO DE 2 COLUMNAS */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
             
             {/* Columna Izquierda */}
             <div className="lg:col-span-5 flex flex-col gap-6">
@@ -274,6 +274,38 @@ export default function App() {
                 </p>
               </BentoCard>
 
+              {/* TARJETAS OPERATIVAS (Movidas a la columna izquierda) */}
+              <BentoCard title="Pendientes" badge="0 Tareas">
+                <div className="flex flex-col items-center justify-center py-8 text-text-muted">
+                  <p className="text-sm">No hay pagos pendientes</p>
+                </div>
+              </BentoCard>
+              
+              <BentoCard 
+                title="Imprevistos" 
+                actionSlot={
+                  <button className="flex items-center gap-1 rounded-full px-4 py-1.5 text-xs font-semibold bg-[#F43F5E]/15 text-[#F43F5E] border border-[#F43F5E]/30 hover:bg-[#F43F5E]/25 shadow-sm transition-all outline-none focus:outline-none focus:ring-0">
+                    <Plus className="w-4 h-4" /> Agregar
+                  </button>
+                }
+              >
+                <div className="flex flex-col items-center justify-center py-8 text-text-muted">
+                  <p className="text-sm">Sin imprevistos registrados</p>
+                </div>
+              </BentoCard>
+              
+              <BentoCard title="Ahorros" badge="Meta">
+                <div className="flex flex-col gap-2 mt-4">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-text-muted">Progreso Global</span>
+                    <span className="font-bold text-text-main tabular-nums tracking-tight">0%</span>
+                  </div>
+                  <div className="h-2 w-full bg-surface-hover border border-border/40 rounded-full overflow-hidden">
+                    <div className="h-full bg-[#10B981] w-0"></div>
+                  </div>
+                </div>
+              </BentoCard>
+
             </div>
 
             {/* Columna Derecha */}
@@ -281,40 +313,6 @@ export default function App() {
               <TablaGastos mesId={mesSeleccionado} isAlejandro={isAle} datos={perfilData} configuracion={data?.configuracion} />
             </div>
             
-          </div>
-
-          {/* 5. FILA INFERIOR: GESTIÓN OPERATIVA */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <BentoCard title="Pendientes" badge="0 Tareas">
-              <div className="flex flex-col items-center justify-center py-8 text-text-muted">
-                <p className="text-sm">No hay pagos pendientes</p>
-              </div>
-            </BentoCard>
-            
-            <BentoCard 
-              title="Imprevistos" 
-              actionSlot={
-                <button className="flex items-center gap-1 rounded-full px-4 py-1.5 text-xs font-semibold bg-[#F43F5E]/15 text-[#F43F5E] border border-[#F43F5E]/30 hover:bg-[#F43F5E]/25 shadow-lg backdrop-blur-md transition-all focus:outline-none focus:ring-1 focus:ring-[#F43F5E]/40">
-                  <Plus className="w-4 h-4" /> Agregar
-                </button>
-              }
-            >
-              <div className="flex flex-col items-center justify-center py-8 text-text-muted">
-                <p className="text-sm">Sin imprevistos registrados</p>
-              </div>
-            </BentoCard>
-            
-            <BentoCard title="Ahorros" badge="Meta">
-              <div className="flex flex-col gap-2 mt-4">
-                <div className="flex justify-between text-sm">
-                  <span className="text-text-muted">Progreso Global</span>
-                  <span className="font-bold text-text-main tabular-nums tracking-tight">0%</span>
-                </div>
-                <div className="h-2 w-full bg-surface-hover border border-border/40 rounded-full overflow-hidden">
-                  <div className="h-full bg-[#10B981] w-0"></div>
-                </div>
-              </div>
-            </BentoCard>
           </div>
 
         </div>
