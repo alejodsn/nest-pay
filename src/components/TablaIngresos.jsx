@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Plus, Edit2, Trash2, Check, X } from 'lucide-react';
 import { doc, updateDoc, arrayRemove } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
-import BentoCard from './ui/BentoCard';
 
 export default function TablaIngresos({ mesId, perfil, datos, isAlejandro }) {
   const [isAdding, setIsAdding] = useState(false);
@@ -119,126 +118,108 @@ export default function TablaIngresos({ mesId, perfil, datos, isAlejandro }) {
 
   return (
     <>
-      <BentoCard 
-        title="Ingresos"
-        actionSlot={
-          <button 
-            onClick={() => setIsAdding(!isAdding)}
-            className="flex items-center gap-1 rounded-full px-4 py-1.5 text-xs font-semibold bg-[#10B981]/15 text-[#10B981] border border-[#10B981]/30 hover:bg-[#10B981]/25 shadow-sm transition-all outline-none focus:outline-none focus:ring-0"
-          >
-            <Plus className="w-4 h-4" /> Agregar
-          </button>
-        }
-        footerSlot={
-          <>
-            <span className="uppercase tracking-wider text-[11px] text-white/40">Total Ingresos</span>
-            <span className="font-space font-semibold text-white/95 tabular-nums">{formatter.format(totalCalculado)}</span>
-          </>
-        }
-      >
-        <div className="w-full overflow-hidden -mx-2 px-2 pb-4">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="border-b border-white/[0.06] text-white/40 font-medium text-[11px] tracking-wider pb-2">
-                <th className="px-2 py-3 font-medium">Ítem</th>
-                <th className="px-2 py-3 font-medium text-right">Total Mes</th>
-                <th className="px-2 py-3 font-medium text-right">Quincena 1 (50%)</th>
-                <th className="px-2 py-3 font-medium text-right">Quincena 2 (50%)</th>
-                <th className="px-2 py-3 font-medium text-right">Acciones</th>
-              </tr>
-            </thead>
-            <tbody className="text-sm">
-              {datos?.map((ingreso) => {
-                if (editingId === ingreso.id) {
-                  return (
-                    <tr key={ingreso.id} className="bg-white/[0.02] border-b border-white/[0.04]">
-                      <td className="px-2 py-3">
-                        <input type="text" className="w-full border border-white/[0.06] bg-transparent text-white/90 rounded p-1 text-sm outline-none focus:outline-none focus:ring-0 focus:ring-offset-0 transition-all" value={editNombre} onChange={(e) => setEditNombre(e.target.value)} />
-                      </td>
-                      <td className="px-2 py-3">
-                        <input type="number" className="w-full border border-white/[0.06] bg-transparent text-white/95 rounded p-1 text-sm text-right font-space font-semibold tabular-nums outline-none focus:outline-none focus:ring-0 focus:ring-offset-0 transition-all" value={editValor} onChange={(e) => setEditValor(e.target.value)} />
-                      </td>
-                      <td className="px-2 py-3 text-right text-white/40 text-xs">Calc...</td>
-                      <td className="px-2 py-3 text-right text-white/40 text-xs">Calc...</td>
-                      <td className="px-2 py-3">
-                        <div className="flex items-center justify-end gap-3">
-                          <label className="flex items-center gap-1 text-[11px] font-medium text-white/60 cursor-pointer">
-                            <input 
-                              type="checkbox" 
-                              className="accent-[#10B981] w-4 h-4 outline-none focus:outline-none focus:ring-0 focus:ring-offset-0 border border-white/20 bg-white/5 rounded transition-all cursor-pointer" 
-                              checked={editFijoCadaMes} 
-                              onChange={(e) => setEditFijoCadaMes(e.target.checked)} 
-                            /> Fijo
-                          </label>
-                          <div className="flex gap-1">
-                            <button onClick={handleSaveEdit} className="p-1 text-[#10B981] hover:bg-white/[0.04] rounded-lg transition-colors outline-none focus:outline-none focus:ring-0"><Check className="w-4 h-4" /></button>
-                            <button onClick={() => setEditingId(null)} className="p-1 text-white/40 hover:bg-white/[0.04] rounded-lg transition-colors outline-none focus:outline-none focus:ring-0"><X className="w-4 h-4" /></button>
-                          </div>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                }
+      <div className="w-full overflow-hidden -mx-2 px-2 pb-4">
+        <table className="w-full text-left border-collapse">
+          <thead>
+            <tr className="border-b border-white/[0.06] text-white/40 font-medium text-[11px] tracking-wider pb-2">
+              <th className="px-2 py-3 font-medium">Ítem</th>
+              <th className="px-2 py-3 font-medium text-right">Total Mes</th>
+              <th className="px-2 py-3 font-medium text-right">Quincena 1 (50%)</th>
+              <th className="px-2 py-3 font-medium text-right">Quincena 2 (50%)</th>
+              <th className="px-2 py-3 font-medium text-right">Acciones</th>
+            </tr>
+          </thead>
+          <tbody className="text-sm">
+            {datos?.map((ingreso) => {
+              if (editingId === ingreso.id) {
                 return (
-                  <tr key={ingreso.id} className="hover:bg-white/[0.02] transition-colors duration-150 border-b border-white/[0.04]">
-                    <td className="px-2 py-3 text-white/90 font-sans text-sm">{ingreso.nombre}</td>
-                    <td className="px-2 py-3 text-right font-space font-semibold text-white/95 tabular-nums">
-                      {formatter.format(ingreso.valor)}
-                    </td>
-                    <td className="px-2 py-3 text-right font-space font-semibold text-white/60 tabular-nums">
-                      {formatter.format(ingreso.valor / 2)}
-                    </td>
-                    <td className="px-2 py-3 text-right font-space font-semibold text-white/60 tabular-nums">
-                      {formatter.format(ingreso.valor / 2)}
+                  <tr key={ingreso.id} className="bg-white/[0.02] border-b border-white/[0.04]">
+                    <td className="px-2 py-3">
+                      <input type="text" className="w-full border border-white/[0.06] bg-transparent text-white/90 rounded p-1 text-sm outline-none focus:outline-none focus:ring-0 focus:ring-offset-0 transition-all" value={editNombre} onChange={(e) => setEditNombre(e.target.value)} />
                     </td>
                     <td className="px-2 py-3">
-                      <div className="flex items-center justify-end gap-2">
-                        <button onClick={() => handleStartEdit(ingreso)} className="text-white/40 hover:text-white/90 transition-colors p-1 rounded-lg hover:bg-white/[0.04] outline-none focus:outline-none focus:ring-0"><Edit2 className="w-4 h-4" /></button>
-                        <button onClick={() => setItemToDelete(ingreso)} className="text-white/40 hover:text-[#F43F5E] transition-colors p-1 rounded-lg hover:bg-white/[0.04] outline-none focus:outline-none focus:ring-0"><Trash2 className="w-4 h-4" /></button>
+                      <input type="number" className="w-full border border-white/[0.06] bg-transparent text-white/95 rounded p-1 text-sm text-right font-space font-semibold tabular-nums outline-none focus:outline-none focus:ring-0 focus:ring-offset-0 transition-all" value={editValor} onChange={(e) => setEditValor(e.target.value)} />
+                    </td>
+                    <td className="px-2 py-3 text-right text-white/40 text-xs">Calc...</td>
+                    <td className="px-2 py-3 text-right text-white/40 text-xs">Calc...</td>
+                    <td className="px-2 py-3">
+                      <div className="flex items-center justify-end gap-3">
+                        <label className="flex items-center gap-1 text-[11px] font-medium text-white/60 cursor-pointer">
+                          <input 
+                            type="checkbox" 
+                            className="accent-[#10B981] w-4 h-4 outline-none focus:outline-none focus:ring-0 focus:ring-offset-0 border border-white/20 bg-white/5 rounded transition-all cursor-pointer" 
+                            checked={editFijoCadaMes} 
+                            onChange={(e) => setEditFijoCadaMes(e.target.checked)} 
+                          /> Fijo
+                        </label>
+                        <div className="flex gap-1">
+                          <button onClick={handleSaveEdit} className="p-1 text-[#10B981] hover:bg-white/[0.04] rounded-lg transition-colors outline-none focus:outline-none focus:ring-0"><Check className="w-4 h-4" /></button>
+                          <button onClick={() => setEditingId(null)} className="p-1 text-white/40 hover:bg-white/[0.04] rounded-lg transition-colors outline-none focus:outline-none focus:ring-0"><X className="w-4 h-4" /></button>
+                        </div>
                       </div>
                     </td>
                   </tr>
                 );
-              })}
-
-              {isAdding && (
-                <tr className="bg-white/[0.02] border-b border-white/[0.04]">
-                  <td className="px-2 py-3">
-                    <input type="text" placeholder="Ej. Salario" className="w-full border border-white/[0.06] bg-transparent text-white/90 rounded p-1 text-sm outline-none focus:outline-none focus:ring-0 focus:ring-offset-0 transition-all" value={nuevoNombre} onChange={(e) => setNuevoNombre(e.target.value)} />
+              }
+              return (
+                <tr key={ingreso.id} className="hover:bg-white/[0.02] transition-colors duration-150 border-b border-white/[0.04]">
+                  <td className="px-2 py-3 text-white/90 font-sans text-sm">{ingreso.nombre}</td>
+                  <td className="px-2 py-3 text-right font-space font-semibold text-white/95 tabular-nums">
+                    {formatter.format(ingreso.valor)}
+                  </td>
+                  <td className="px-2 py-3 text-right font-space font-semibold text-white/60 tabular-nums">
+                    {formatter.format(ingreso.valor / 2)}
+                  </td>
+                  <td className="px-2 py-3 text-right font-space font-semibold text-white/60 tabular-nums">
+                    {formatter.format(ingreso.valor / 2)}
                   </td>
                   <td className="px-2 py-3">
-                    <input type="number" placeholder="Valor total" className="w-full border border-white/[0.06] bg-transparent text-white/95 rounded p-1 text-sm text-right font-space font-semibold tabular-nums outline-none focus:outline-none focus:ring-0 focus:ring-offset-0 transition-all" value={nuevoValor} onChange={(e) => setNuevoValor(e.target.value)} />
-                  </td>
-                  <td className="px-2 py-3 text-right text-white/40 text-xs">Calc...</td>
-                  <td className="px-2 py-3 text-right text-white/40 text-xs">Calc...</td>
-                  <td className="px-2 py-3">
-                    <div className="flex items-center justify-end gap-3">
-                      <label className="flex items-center gap-1 text-[11px] font-medium text-white/60 cursor-pointer">
-                        <input 
-                          type="checkbox" 
-                          className="accent-[#10B981] w-4 h-4 outline-none focus:outline-none focus:ring-0 focus:ring-offset-0 border border-white/20 bg-white/5 rounded transition-all cursor-pointer" 
-                          checked={nuevoFijoCadaMes} 
-                          onChange={(e) => setNuevoFijoCadaMes(e.target.checked)} 
-                        /> Fijo
-                      </label>
-                      <div className="flex gap-1">
-                        <button onClick={handleAdd} className="p-1 text-[#10B981] hover:bg-white/[0.04] rounded-lg transition-colors outline-none focus:outline-none focus:ring-0"><Check className="w-4 h-4" /></button>
-                        <button onClick={() => setIsAdding(false)} className="p-1 text-white/40 hover:bg-white/[0.04] rounded-lg transition-colors outline-none focus:outline-none focus:ring-0"><X className="w-4 h-4" /></button>
-                      </div>
+                    <div className="flex items-center justify-end gap-2">
+                      <button onClick={() => handleStartEdit(ingreso)} className="text-white/40 hover:text-white/90 transition-colors p-1 rounded-lg hover:bg-white/[0.04] outline-none focus:outline-none focus:ring-0"><Edit2 className="w-4 h-4" /></button>
+                      <button onClick={() => setItemToDelete(ingreso)} className="text-white/40 hover:text-[#F43F5E] transition-colors p-1 rounded-lg hover:bg-white/[0.04] outline-none focus:outline-none focus:ring-0"><Trash2 className="w-4 h-4" /></button>
                     </div>
                   </td>
                 </tr>
-              )}
-              
-              {!datos?.length && !isAdding && (
-                <tr>
-                  <td colSpan="5" className="px-2 py-8 text-center text-white/40 italic border-b border-white/[0.04]">No hay ingresos registrados aún.</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </BentoCard>
+              );
+            })}
+
+            {isAdding && (
+              <tr className="bg-white/[0.02] border-b border-white/[0.04]">
+                <td className="px-2 py-3">
+                  <input type="text" placeholder="Ej. Salario" className="w-full border border-white/[0.06] bg-transparent text-white/90 rounded p-1 text-sm outline-none focus:outline-none focus:ring-0 focus:ring-offset-0 transition-all" value={nuevoNombre} onChange={(e) => setNuevoNombre(e.target.value)} />
+                </td>
+                <td className="px-2 py-3">
+                  <input type="number" placeholder="Valor total" className="w-full border border-white/[0.06] bg-transparent text-white/95 rounded p-1 text-sm text-right font-space font-semibold tabular-nums outline-none focus:outline-none focus:ring-0 focus:ring-offset-0 transition-all" value={nuevoValor} onChange={(e) => setNuevoValor(e.target.value)} />
+                </td>
+                <td className="px-2 py-3 text-right text-white/40 text-xs">Calc...</td>
+                <td className="px-2 py-3 text-right text-white/40 text-xs">Calc...</td>
+                <td className="px-2 py-3">
+                  <div className="flex items-center justify-end gap-3">
+                    <label className="flex items-center gap-1 text-[11px] font-medium text-white/60 cursor-pointer">
+                      <input 
+                        type="checkbox" 
+                        className="accent-[#10B981] w-4 h-4 outline-none focus:outline-none focus:ring-0 focus:ring-offset-0 border border-white/20 bg-white/5 rounded transition-all cursor-pointer" 
+                        checked={nuevoFijoCadaMes} 
+                        onChange={(e) => setNuevoFijoCadaMes(e.target.checked)} 
+                      /> Fijo
+                    </label>
+                    <div className="flex gap-1">
+                      <button onClick={handleAdd} className="p-1 text-[#10B981] hover:bg-white/[0.04] rounded-lg transition-colors outline-none focus:outline-none focus:ring-0"><Check className="w-4 h-4" /></button>
+                      <button onClick={() => setIsAdding(false)} className="p-1 text-white/40 hover:bg-white/[0.04] rounded-lg transition-colors outline-none focus:outline-none focus:ring-0"><X className="w-4 h-4" /></button>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            )}
+            
+            {!datos?.length && !isAdding && (
+              <tr>
+                <td colSpan="5" className="px-2 py-8 text-center text-white/40 italic border-b border-white/[0.04]">No hay ingresos registrados aún.</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
 
       {/* Modal de Eliminación Inteligente */}
       {itemToDelete && (
