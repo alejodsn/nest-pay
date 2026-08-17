@@ -3,7 +3,6 @@ import { Plus, Trash2, Check, X, Info, Edit2 } from 'lucide-react';
 import { doc, updateDoc, arrayRemove } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 import { getWorkingDaysForMonth } from '../utils/dateUtils';
-import BentoCard from './ui/BentoCard';
 
 export default function TablaGastos({ mesId, perfil, datos, isAlejandro, configuracion }) {
   const [isAdding, setIsAdding] = useState(false);
@@ -199,20 +198,20 @@ export default function TablaGastos({ mesId, perfil, datos, isAlejandro, configu
     if (editingId === item.id) {
       return (
         <tr className="bg-white/[0.02] border-b border-white/[0.04]">
-          <td className="px-2 py-3">
+          <td className="py-3">
             <input type="text" className="w-full border border-white/[0.06] bg-transparent text-white/90 rounded p-1 text-sm outline-none focus:outline-none focus:ring-0 focus:ring-offset-0 transition-all" value={editNombre} onChange={(e) => setEditNombre(e.target.value)} />
           </td>
-          <td className="px-2 py-3">
+          <td className="py-3">
             <input type="number" className="w-full border border-white/[0.06] bg-transparent text-white/95 rounded p-1 text-sm text-right tabular-nums font-space font-semibold tracking-tight outline-none focus:outline-none focus:ring-0 focus:ring-offset-0 transition-all" value={editValor} onChange={(e) => setEditValor(e.target.value)} />
           </td>
-          <td className="px-2 py-3 text-center text-white/40 text-xs">Calc...</td>
-          <td className="px-2 py-3 text-center text-white/40 text-xs">Calc...</td>
-          <td className="px-2 py-3">
+          <td className="py-3 text-center text-white/40 text-xs">Calc...</td>
+          <td className="py-3 text-center text-white/40 text-xs">Calc...</td>
+          <td className="py-3">
             <div className="flex items-center justify-end gap-3">
               <label className="flex items-center gap-1 text-[11px] font-medium text-white/60 cursor-pointer">
                 <input 
                   type="checkbox" 
-                  className="accent-[#F43F5E] w-4 h-4 outline-none focus:outline-none focus:ring-0 focus:ring-offset-0 border border-white/20 bg-white/5 rounded transition-all cursor-pointer" 
+                  className="cursor-pointer accent-emerald-500 rounded outline-none w-4 h-4 border border-white/20 bg-white/5 transition-all" 
                   checked={editMensual} 
                   onChange={(e) => setEditMensual(e.target.checked)} 
                 /> Fijo
@@ -229,30 +228,30 @@ export default function TablaGastos({ mesId, perfil, datos, isAlejandro, configu
 
     return (
       <tr className="hover:bg-white/[0.02] transition-colors duration-150 border-b border-white/[0.04]">
-        <td className="px-2 py-3 text-white/90 font-sans text-sm">
+        <td className="py-3 text-white/90 font-sans text-sm">
           {item.nombre}
           {isReserva && <span className="ml-2 text-[10px] bg-[#10B981]/10 text-[#10B981] px-2 py-0.5 rounded-full uppercase font-bold border border-transparent">Reserva</span>}
         </td>
-        <td className="px-2 py-3 text-right font-space font-semibold text-white/95 tabular-nums">
+        <td className="py-3 text-right font-space font-semibold text-white/95 tabular-nums">
           {formatter.format(valorCalculado || item.valor)}
         </td>
-        <td className="px-2 py-3 text-center">
+        <td className="py-3 text-center">
           <label className="inline-flex items-center gap-2 cursor-pointer group">
-            <input type="checkbox" checked={q1_pagado} onChange={onToggleQ1} className="accent-[#10B981] w-4 h-4 outline-none focus:outline-none focus:ring-0 focus:ring-offset-0 border border-white/20 bg-white/5 rounded transition-all cursor-pointer" />
-            <span className={`transition-all font-space font-semibold text-white/95 tabular-nums ${q1_pagado ? 'line-through opacity-50 text-[#10B981]' : 'text-white/60'}`}>
+            <input type="checkbox" checked={q1_pagado} onChange={onToggleQ1} className="cursor-pointer accent-emerald-500 rounded outline-none w-4 h-4 border border-white/20 bg-white/5 transition-all" />
+            <span className={`transition-all font-space font-semibold tabular-nums ${q1_pagado ? 'line-through opacity-50 text-[#10B981]' : 'text-white/60'}`}>
               {formatter.format(item.valorQ1 || (item.valor / 2))}
             </span>
           </label>
         </td>
-        <td className="px-2 py-3 text-center">
+        <td className="py-3 text-center">
           <label className="inline-flex items-center gap-2 cursor-pointer group">
-            <input type="checkbox" checked={q2_pagado} onChange={onToggleQ2} className="accent-[#10B981] w-4 h-4 outline-none focus:outline-none focus:ring-0 focus:ring-offset-0 border border-white/20 bg-white/5 rounded transition-all cursor-pointer" />
-            <span className={`transition-all font-space font-semibold text-white/95 tabular-nums ${q2_pagado ? 'line-through opacity-50 text-[#10B981]' : 'text-white/60'}`}>
+            <input type="checkbox" checked={q2_pagado} onChange={onToggleQ2} className="cursor-pointer accent-emerald-500 rounded outline-none w-4 h-4 border border-white/20 bg-white/5 transition-all" />
+            <span className={`transition-all font-space font-semibold tabular-nums ${q2_pagado ? 'line-through opacity-50 text-[#10B981]' : 'text-white/60'}`}>
               {formatter.format(item.valorQ2 || (item.valor / 2))}
             </span>
           </label>
         </td>
-        <td className="px-2 py-3">
+        <td className="py-3">
           {isAuto || isReserva ? <span className="text-xs text-white/40 italic block text-right font-medium">Auto</span> : (
             <div className="flex items-center justify-end gap-2">
               {onEdit && <button onClick={onEdit} className="text-white/40 hover:text-white/90 transition-colors p-1 rounded-lg hover:bg-white/[0.04] outline-none focus:outline-none focus:ring-0"><Edit2 className="w-4 h-4" /></button>}
@@ -266,128 +265,110 @@ export default function TablaGastos({ mesId, perfil, datos, isAlejandro, configu
 
   return (
     <>
-      <BentoCard 
-        title="Gastos Fijos & Obligaciones"
-        actionSlot={
-          <button 
-            onClick={() => setIsAdding(!isAdding)}
-            className="flex items-center gap-1 rounded-full px-4 py-1.5 text-xs font-semibold bg-[#F43F5E]/15 text-[#F43F5E] border border-[#F43F5E]/30 hover:bg-[#F43F5E]/25 shadow-sm transition-all outline-none focus:outline-none focus:ring-0"
-          >
-            <Plus className="w-4 h-4" /> Agregar
-          </button>
-        }
-        footerSlot={
-          <>
-            <span className="uppercase tracking-wider text-[11px] text-white/40">Total Gastos</span>
-            <span className="font-space font-semibold text-white/95 tabular-nums">{formatter.format(granTotal)}</span>
-          </>
-        }
-      >
-        <div className="w-full overflow-hidden -mx-2 px-2 pb-4">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="border-b border-white/[0.06] text-white/40 font-medium text-[11px] tracking-wider pb-2">
-                <th className="px-2 py-3 font-medium">Ítem</th>
-                <th className="px-2 py-3 font-medium text-right">Total Mes</th>
-                <th className="px-2 py-3 font-medium text-center">Quincena 1</th>
-                <th className="px-2 py-3 font-medium text-center">Quincena 2</th>
-                <th className="px-2 py-3 font-medium text-right">Acciones</th>
-              </tr>
-            </thead>
-            <tbody className="text-sm">
+      <div className="w-full overflow-hidden">
+        <table className="w-full text-left border-collapse">
+          <thead>
+            <tr className="border-b border-white/[0.06] text-white/40 font-medium text-[11px] tracking-wider pb-2">
+              <th className="py-3 font-medium">Ítem</th>
+              <th className="py-3 font-medium text-right">Total Mes</th>
+              <th className="py-3 font-medium text-center">Quincena 1</th>
+              <th className="py-3 font-medium text-center">Quincena 2</th>
+              <th className="py-3 font-medium text-right">Acciones</th>
+            </tr>
+          </thead>
+          <tbody className="text-sm">
 
-              {/* SECCIÓN 1: INMUTABLES */}
-              <tr className="border-b border-white/[0.04]">
-                <td colSpan="5" className="px-2 pt-6 pb-2 text-[11px] font-bold text-white/40 uppercase tracking-wider flex items-center gap-2"><Info className="w-3.5 h-3.5" /> Obligaciones de Ley</td>
-              </tr>
-              {inmutables.map(item => (
-                <FilaGasto
-                  key={item.id} item={item} valorCalculado={item.valorQ1 + item.valorQ2}
-                  q1_pagado={estadosInmutables[item.id]?.q1 || false}
-                  q2_pagado={estadosInmutables[item.id]?.q2 || false}
-                  onToggleQ1={() => handleToggleInmutable(item.id, 'q1', estadosInmutables[item.id]?.q1 || false)}
-                  onToggleQ2={() => handleToggleInmutable(item.id, 'q2', estadosInmutables[item.id]?.q2 || false)}
-                  isAuto={true}
-                />
-              ))}
-
-              {/* SECCIÓN 2: FIJOS */}
-              <tr className="border-b border-white/[0.04]">
-                <td colSpan="5" className="px-2 pt-6 pb-2 text-[11px] font-bold text-white/40 uppercase tracking-wider flex items-center gap-2"><Info className="w-3.5 h-3.5" /> Gastos Fijos</td>
-              </tr>
-              {gastosFijos.map(gasto => (
-                <FilaGasto
-                  key={gasto.id} item={gasto}
-                  q1_pagado={gasto.q1_pagado} q2_pagado={gasto.q2_pagado}
-                  onToggleQ1={() => handleToggleGasto(gasto, 'gastos_fijos', 'q1', gasto.q1_pagado)}
-                  onToggleQ2={() => handleToggleGasto(gasto, 'gastos_fijos', 'q2', gasto.q2_pagado)}
-                  onEdit={() => handleStartEdit(gasto, 'gastos_fijos')}
-                  onDelete={() => handleDeleteClick(gasto, 'gastos_fijos')}
-                />
-              ))}
-
-              {/* SECCIÓN 3: VARIABLES */}
-              <tr className="border-b border-white/[0.04]">
-                <td colSpan="5" className="px-2 pt-6 pb-2 text-[11px] font-bold text-white/40 uppercase tracking-wider flex items-center gap-2"><Info className="w-3.5 h-3.5" /> Gastos Variables (Mes en curso)</td>
-              </tr>
-              {gastosVariables.map(gasto => (
-                <FilaGasto
-                  key={gasto.id} item={gasto}
-                  q1_pagado={gasto.q1_pagado} q2_pagado={gasto.q2_pagado}
-                  onToggleQ1={() => handleToggleGasto(gasto, 'gastos_variables', 'q1', gasto.q1_pagado)}
-                  onToggleQ2={() => handleToggleGasto(gasto, 'gastos_variables', 'q2', gasto.q2_pagado)}
-                  onEdit={() => handleStartEdit(gasto, 'gastos_variables')}
-                  onDelete={() => handleDeleteClick(gasto, 'gastos_variables')}
-                />
-              ))}
-
-              {isAdding && (
-                <tr className="bg-white/[0.02] border-b border-white/[0.04]">
-                  <td className="px-2 py-3"><input type="text" placeholder="Ej. Regalo" className="w-full border border-white/[0.06] bg-transparent text-white/90 rounded p-1 text-sm outline-none focus:outline-none focus:ring-0 focus:ring-offset-0 transition-all" value={nuevoNombre} onChange={(e) => setNuevoNombre(e.target.value)} /></td>
-                  <td className="px-2 py-3">
-                    <input type="number" placeholder="Valor" className="w-full border border-white/[0.06] bg-transparent text-white/95 rounded p-1 text-sm text-right font-space font-semibold tabular-nums outline-none focus:outline-none focus:ring-0 focus:ring-offset-0 transition-all" value={nuevoValor} onChange={(e) => setNuevoValor(e.target.value)} />
-                  </td>
-                  <td className="px-2 py-3 text-center text-white/40 text-xs">Calc...</td>
-                  <td className="px-2 py-3 text-center text-white/40 text-xs">Calc...</td>
-                  <td className="px-2 py-3">
-                    <div className="flex items-center justify-end gap-3">
-                      <label className="flex items-center gap-1 text-[11px] font-medium text-white/60 cursor-pointer">
-                        <input 
-                          type="checkbox" 
-                          className="accent-[#F43F5E] w-4 h-4 outline-none focus:outline-none focus:ring-0 focus:ring-offset-0 border border-white/20 bg-white/5 rounded transition-all cursor-pointer" 
-                          checked={nuevoMensual} 
-                          onChange={(e) => setNuevoMensual(e.target.checked)} 
-                        /> Fijo
-                      </label>
-                      <div className="flex gap-1">
-                        <button onClick={handleAddVariable} className="p-1 text-[#F43F5E] hover:bg-white/[0.04] rounded-lg transition-colors outline-none focus:outline-none focus:ring-0"><Check className="w-4 h-4" /></button>
-                        <button onClick={() => setIsAdding(false)} className="p-1 text-white/40 hover:bg-white/[0.04] rounded-lg transition-colors outline-none focus:outline-none focus:ring-0"><X className="w-4 h-4" /></button>
-                      </div>
-                    </div>
-                  </td>
-                </tr>
-              )}
-
-              {!gastosVariables.length && !isAdding && (
-                <tr><td colSpan="5" className="px-2 py-8 text-center text-white/40 italic border-b border-white/[0.04]">No hay imprevistos registrados este mes.</td></tr>
-              )}
-
-              {/* SECCIÓN 4: RESERVA */}
-              <tr className="border-b border-white/[0.04]">
-                <td colSpan="5" className="px-2 pt-6 pb-2 text-[11px] font-bold text-white/40 uppercase tracking-wider flex items-center gap-2"><Info className="w-3.5 h-3.5" /> Ahorro</td>
-              </tr>
+            {/* SECCIÓN 1: INMUTABLES */}
+            <tr className="border-b border-white/[0.04]">
+              <td colSpan="5" className="pt-6 pb-2 text-[11px] font-bold text-white/40 uppercase tracking-wider flex items-center gap-2"><Info className="w-3.5 h-3.5" /> Obligaciones de Ley</td>
+            </tr>
+            {inmutables.map(item => (
               <FilaGasto
-                item={reserva}
-                q1_pagado={reserva.q1_pagado} q2_pagado={reserva.q2_pagado}
-                onToggleQ1={() => handleToggleReserva('q1', reserva.q1_pagado)}
-                onToggleQ2={() => handleToggleReserva('q2', reserva.q2_pagado)}
-                isReserva={true}
+                key={item.id} item={item} valorCalculado={item.valorQ1 + item.valorQ2}
+                q1_pagado={estadosInmutables[item.id]?.q1 || false}
+                q2_pagado={estadosInmutables[item.id]?.q2 || false}
+                onToggleQ1={() => handleToggleInmutable(item.id, 'q1', estadosInmutables[item.id]?.q1 || false)}
+                onToggleQ2={() => handleToggleInmutable(item.id, 'q2', estadosInmutables[item.id]?.q2 || false)}
+                isAuto={true}
               />
+            ))}
 
-            </tbody>
-          </table>
-        </div>
-      </BentoCard>
+            {/* SECCIÓN 2: FIJOS */}
+            <tr className="border-b border-white/[0.04]">
+              <td colSpan="5" className="pt-6 pb-2 text-[11px] font-bold text-white/40 uppercase tracking-wider flex items-center gap-2"><Info className="w-3.5 h-3.5" /> Gastos Fijos</td>
+            </tr>
+            {gastosFijos.map(gasto => (
+              <FilaGasto
+                key={gasto.id} item={gasto}
+                q1_pagado={gasto.q1_pagado} q2_pagado={gasto.q2_pagado}
+                onToggleQ1={() => handleToggleGasto(gasto, 'gastos_fijos', 'q1', gasto.q1_pagado)}
+                onToggleQ2={() => handleToggleGasto(gasto, 'gastos_fijos', 'q2', gasto.q2_pagado)}
+                onEdit={() => handleStartEdit(gasto, 'gastos_fijos')}
+                onDelete={() => handleDeleteClick(gasto, 'gastos_fijos')}
+              />
+            ))}
+
+            {/* SECCIÓN 3: VARIABLES */}
+            <tr className="border-b border-white/[0.04]">
+              <td colSpan="5" className="pt-6 pb-2 text-[11px] font-bold text-white/40 uppercase tracking-wider flex items-center gap-2"><Info className="w-3.5 h-3.5" /> Gastos Variables (Mes en curso)</td>
+            </tr>
+            {gastosVariables.map(gasto => (
+              <FilaGasto
+                key={gasto.id} item={gasto}
+                q1_pagado={gasto.q1_pagado} q2_pagado={gasto.q2_pagado}
+                onToggleQ1={() => handleToggleGasto(gasto, 'gastos_variables', 'q1', gasto.q1_pagado)}
+                onToggleQ2={() => handleToggleGasto(gasto, 'gastos_variables', 'q2', gasto.q2_pagado)}
+                onEdit={() => handleStartEdit(gasto, 'gastos_variables')}
+                onDelete={() => handleDeleteClick(gasto, 'gastos_variables')}
+              />
+            ))}
+
+            {isAdding && (
+              <tr className="bg-white/[0.02] border-b border-white/[0.04]">
+                <td className="py-3"><input type="text" placeholder="Ej. Regalo" className="w-full border border-white/[0.06] bg-transparent text-white/90 rounded p-1 text-sm outline-none focus:outline-none focus:ring-0 focus:ring-offset-0 transition-all" value={nuevoNombre} onChange={(e) => setNuevoNombre(e.target.value)} /></td>
+                <td className="py-3">
+                  <input type="number" placeholder="Valor" className="w-full border border-white/[0.06] bg-transparent text-white/95 rounded p-1 text-sm text-right font-space font-semibold tabular-nums outline-none focus:outline-none focus:ring-0 focus:ring-offset-0 transition-all" value={nuevoValor} onChange={(e) => setNuevoValor(e.target.value)} />
+                </td>
+                <td className="py-3 text-center text-white/40 text-xs">Calc...</td>
+                <td className="py-3 text-center text-white/40 text-xs">Calc...</td>
+                <td className="py-3">
+                  <div className="flex items-center justify-end gap-3">
+                    <label className="flex items-center gap-1 text-[11px] font-medium text-white/60 cursor-pointer">
+                      <input 
+                        type="checkbox" 
+                        className="cursor-pointer accent-emerald-500 rounded outline-none w-4 h-4 border border-white/20 bg-white/5 transition-all" 
+                        checked={nuevoMensual} 
+                        onChange={(e) => setNuevoMensual(e.target.checked)} 
+                      /> Fijo
+                    </label>
+                    <div className="flex gap-1">
+                      <button onClick={handleAddVariable} className="p-1 text-[#F43F5E] hover:bg-white/[0.04] rounded-lg transition-colors outline-none focus:outline-none focus:ring-0"><Check className="w-4 h-4" /></button>
+                      <button onClick={() => setIsAdding(false)} className="p-1 text-white/40 hover:bg-white/[0.04] rounded-lg transition-colors outline-none focus:outline-none focus:ring-0"><X className="w-4 h-4" /></button>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            )}
+
+            {!gastosVariables.length && !isAdding && (
+              <tr><td colSpan="5" className="py-8 text-center text-white/40 italic border-b border-white/[0.04]">No hay imprevistos registrados este mes.</td></tr>
+            )}
+
+            {/* SECCIÓN 4: RESERVA */}
+            <tr className="border-b border-white/[0.04]">
+              <td colSpan="5" className="pt-6 pb-2 text-[11px] font-bold text-white/40 uppercase tracking-wider flex items-center gap-2"><Info className="w-3.5 h-3.5" /> Ahorro</td>
+            </tr>
+            <FilaGasto
+              item={reserva}
+              q1_pagado={reserva.q1_pagado} q2_pagado={reserva.q2_pagado}
+              onToggleQ1={() => handleToggleReserva('q1', reserva.q1_pagado)}
+              onToggleQ2={() => handleToggleReserva('q2', reserva.q2_pagado)}
+              isReserva={true}
+            />
+
+          </tbody>
+        </table>
+      </div>
 
       {/* Modal de Eliminación Inteligente */}
       {itemToDelete && (
