@@ -4,6 +4,7 @@
 
 @layer base {
   :root {
+    color-scheme: dark;
     --color-base: #F8FAFC;
     --color-surface: rgba(255, 255, 255, 0.9);
     --color-surface-hover: rgba(241, 245, 249, 0.8);
@@ -23,5 +24,7 @@
 
   body {
     @apply font-sans antialiased tabular-nums;
+    background-color: #0D1117;
+    color: white;
   }
 }
