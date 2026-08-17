@@ -10,7 +10,10 @@ export default function BentoCard({
   className = '' 
 }) {
   return (
-    <div className={`relative w-full bg-surface border border-white/[0.08] backdrop-blur-xl rounded-3xl p-6 shadow-2xl transition-all duration-300 flex flex-col justify-between ${className}`}>
+    <div 
+      className={`relative w-full bg-surface border border-white/[0.08] backdrop-blur-xl rounded-3xl p-6 shadow-xl transition-all duration-300 flex flex-col justify-between ${className}`}
+      style={{ isolation: 'isolate', contain: 'paint' }}
+    >
       
       {/* Cabecera */}
       <div className="flex items-center justify-between gap-4 mb-5">
