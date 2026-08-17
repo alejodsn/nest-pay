@@ -10,17 +10,17 @@ export default function BentoCard({
   className = '' 
 }) {
   return (
-    <div 
-      className={`relative w-full bg-surface border border-white/[0.08] backdrop-blur-xl rounded-3xl p-6 shadow-xl transition-all duration-300 flex flex-col justify-between transform-gpu translate-z-0 will-change-transform ${className}`}
-      style={{ isolation: 'isolate', contain: 'paint' }}
-    >
+    <div className={`relative w-full bg-surface border border-border rounded-3xl p-6 shadow-xl transition-all duration-300 flex flex-col justify-between z-0 ${className}`}>
       
+      {/* CAPA DE CRISTAL AISLADA: Mata el resplandor fantasma de Chrome aislando el backdrop-blur */}
+      <div className="absolute inset-0 -z-10 backdrop-blur-xl rounded-3xl overflow-hidden pointer-events-none"></div>
+
       {/* Cabecera */}
       <div className="flex items-center justify-between gap-4 mb-5">
-        <h2 className="font-sans font-bold text-lg text-white/95 tracking-tight flex items-center gap-2">
+        <h2 className="font-sans font-bold text-lg text-text-main tracking-tight flex items-center gap-2">
           {title}
           {badge && (
-            <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/[0.03] text-white/70 border border-white/[0.06] uppercase tracking-wider font-semibold">
+            <span className="text-[10px] px-2 py-0.5 rounded-full bg-surface-hover text-text-muted border border-border uppercase tracking-wider font-semibold">
               {badge}
             </span>
           )}
@@ -34,14 +34,14 @@ export default function BentoCard({
       </div>
 
       {/* Cuerpo */}
-      <div className="w-full flex-1">
+      <div className="w-full flex-1 relative z-10">
         {children}
       </div>
 
       {/* Pie / Footer */}
       {(totalAmount || totalLabel) && (
-        <div className="mt-5 pt-4 border-t border-white/[0.05] flex items-center justify-between">
-          <div className="text-xs uppercase tracking-wider text-white/40 font-semibold">
+        <div className="mt-5 pt-4 border-t border-border flex items-center justify-between relative z-10">
+          <div className="text-xs uppercase tracking-wider text-text-muted font-semibold">
             {totalLabel}
           </div>
           <div className="text-xl font-bold text-brand-emerald font-sans tabular-nums">
