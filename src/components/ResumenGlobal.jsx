@@ -65,26 +65,26 @@ export default function ResumenGlobal({ data, mesSeleccionado }) {
   });
 
   return (
-    <div className="bg-white dark:bg-transparent rounded-xl shadow-sm border border-slate-200 dark:border-transparent p-4 flex flex-col md:flex-row gap-6 justify-around items-center">
+    <div className="bg-surface rounded-xl shadow-sm border border-border p-4 flex flex-col md:flex-row gap-6 justify-around items-center">
       <div className="flex items-center gap-3">
-        <div className="p-3 bg-green-100 dark:bg-emerald-400/10 text-green-600 dark:text-emerald-400 rounded-lg">
+        <div className="p-3 bg-brand-500/10 text-brand-600 rounded-lg">
           <Wallet className="w-6 h-6" />
         </div>
         <div>
-          <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Ingresos Totales (Familia)</p>
-          <p className="text-2xl font-bold text-slate-800 dark:text-white">{formatter.format(stats.ingresosTotales)}</p>
+          <p className="text-sm text-text-muted font-medium">Ingresos Totales (Familia)</p>
+          <p className="text-2xl font-bold text-text-main">{formatter.format(stats.ingresosTotales)}</p>
         </div>
       </div>
 
-      <div className="hidden md:block w-px h-12 bg-slate-200 dark:bg-white/10"></div>
+      <div className="hidden md:block w-px h-12 bg-border"></div>
 
       <div className="flex items-center gap-3">
-        <div className="p-3 bg-rose-100 dark:bg-rose-400/10 text-rose-600 dark:text-rose-400 rounded-lg">
+        <div className="p-3 bg-rose-500/10 text-rose-600 rounded-lg">
           <TrendingDown className="w-6 h-6" />
         </div>
         <div>
-          <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Gastos Totales</p>
-          <p className="text-2xl font-bold text-slate-800 dark:text-white">{formatter.format(stats.gastosTotales)}</p>
+          <p className="text-sm text-text-muted font-medium">Gastos Totales</p>
+          <p className="text-2xl font-bold text-text-main">{formatter.format(stats.gastosTotales)}</p>
         </div>
       </div>
     </div>
