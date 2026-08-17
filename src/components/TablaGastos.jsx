@@ -200,28 +200,28 @@ export default function TablaGastos({ mesId, perfil, datos, isAlejandro, configu
   const FilaGasto = ({ item, valorCalculado, q1_pagado, q2_pagado, onToggleQ1, onToggleQ2, onDelete, onEdit, isAuto, isReserva }) => {
     if (editingId === item.id) {
       return (
-        <tr className="bg-rose-50 dark:bg-rose-500/10">
+        <tr className="bg-rose-50">
           <td className="px-6 py-4">
-            <input type="text" className="w-full border-slate-300 dark:border-white/20 dark:bg-[#0B0F19] dark:text-white rounded p-1 text-sm focus:ring-rose-500" value={editNombre} onChange={(e) => setEditNombre(e.target.value)} />
+            <input type="text" className="w-full border-border bg-base text-text-main rounded p-1 text-sm focus:ring-rose-500" value={editNombre} onChange={(e) => setEditNombre(e.target.value)} />
           </td>
           <td className="px-6 py-4">
-            <input type="number" className="w-full border-slate-300 dark:border-white/20 dark:bg-[#0B0F19] dark:text-white rounded p-1 text-sm text-right focus:ring-rose-500" value={editValor} onChange={(e) => setEditValor(e.target.value)} />
+            <input type="number" className="w-full border-border bg-base text-text-main rounded p-1 text-sm text-right focus:ring-rose-500" value={editValor} onChange={(e) => setEditValor(e.target.value)} />
           </td>
-          <td className="px-6 py-4 text-center text-slate-400 text-xs">Calc...</td>
-          <td className="px-6 py-4 text-center text-slate-400 text-xs">Calc...</td>
+          <td className="px-6 py-4 text-center text-text-muted text-xs">Calc...</td>
+          <td className="px-6 py-4 text-center text-text-muted text-xs">Calc...</td>
           <td className="px-6 py-4">
             <div className="flex items-center justify-end gap-3">
-              <label className="flex items-center gap-1 text-[11px] font-medium text-slate-600 dark:text-slate-300 cursor-pointer">
+              <label className="flex items-center gap-1 text-[11px] font-medium text-text-muted cursor-pointer">
                 <input 
                   type="checkbox" 
-                  className="rounded text-rose-500 dark:bg-[#0B0F19] w-3.5 h-3.5 border-slate-300 dark:border-white/20" 
+                  className="rounded text-rose-500 bg-base w-3.5 h-3.5 border-border" 
                   checked={editMensual} 
                   onChange={(e) => setEditMensual(e.target.checked)} 
                 /> Fijo cada mes
               </label>
               <div className="flex gap-1">
-                <button onClick={handleSaveEdit} className="p-1 text-green-600 dark:text-emerald-400 hover:bg-green-100 dark:hover:bg-emerald-500/20 rounded"><Check className="w-4 h-4" /></button>
-                <button onClick={() => setEditingId(null)} className="p-1 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-white/10 rounded"><X className="w-4 h-4" /></button>
+                <button onClick={handleSaveEdit} className="p-1 text-brand-600 hover:bg-brand-100 rounded"><Check className="w-4 h-4" /></button>
+                <button onClick={() => setEditingId(null)} className="p-1 text-text-muted hover:bg-surface-hover rounded"><X className="w-4 h-4" /></button>
               </div>
             </div>
           </td>
@@ -230,35 +230,35 @@ export default function TablaGastos({ mesId, perfil, datos, isAlejandro, configu
     }
 
     return (
-      <tr className="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
-        <td className="px-6 py-4 font-medium text-slate-700 dark:text-slate-200">
+      <tr className="hover:bg-surface-hover transition-colors">
+        <td className="px-6 py-4 font-medium text-text-main">
           {item.nombre}
-          {isReserva && <span className="ml-2 text-[10px] bg-brand-100 dark:bg-emerald-500/20 text-brand-700 dark:text-emerald-400 px-2 py-0.5 rounded-full uppercase font-bold border dark:border-emerald-500/50">Reserva</span>}
+          {isReserva && <span className="ml-2 text-[10px] bg-brand-100 text-brand-600 px-2 py-0.5 rounded-full uppercase font-bold border border-transparent">Reserva</span>}
         </td>
-        <td className="px-6 py-4 text-right font-semibold text-slate-800 dark:text-white">
+        <td className="px-6 py-4 text-right font-semibold text-text-main">
           {formatter.format(valorCalculado || item.valor)}
         </td>
         <td className="px-6 py-4 text-center">
           <label className="inline-flex items-center gap-2 cursor-pointer group">
-            <input type="checkbox" checked={q1_pagado} onChange={onToggleQ1} className="w-5 h-5 rounded border-slate-300 dark:border-white/20 dark:bg-[#0B0F19] text-rose-500 focus:ring-rose-500 cursor-pointer" />
-            <span className={`text-slate-600 dark:text-slate-400 transition-all ${q1_pagado ? 'line-through text-slate-400 dark:text-slate-500 opacity-50' : ''}`}>
+            <input type="checkbox" checked={q1_pagado} onChange={onToggleQ1} className="w-5 h-5 rounded border-border bg-base text-rose-500 focus:ring-rose-500 cursor-pointer" />
+            <span className={`text-text-muted transition-all ${q1_pagado ? 'line-through opacity-50' : ''}`}>
               {formatter.format(item.valorQ1 || (item.valor / 2))}
             </span>
           </label>
         </td>
         <td className="px-6 py-4 text-center">
           <label className="inline-flex items-center gap-2 cursor-pointer group">
-            <input type="checkbox" checked={q2_pagado} onChange={onToggleQ2} className="w-5 h-5 rounded border-slate-300 dark:border-white/20 dark:bg-[#0B0F19] text-rose-500 focus:ring-rose-500 cursor-pointer" />
-            <span className={`text-slate-600 dark:text-slate-400 transition-all ${q2_pagado ? 'line-through text-slate-400 dark:text-slate-500 opacity-50' : ''}`}>
+            <input type="checkbox" checked={q2_pagado} onChange={onToggleQ2} className="w-5 h-5 rounded border-border bg-base text-rose-500 focus:ring-rose-500 cursor-pointer" />
+            <span className={`text-text-muted transition-all ${q2_pagado ? 'line-through opacity-50' : ''}`}>
               {formatter.format(item.valorQ2 || (item.valor / 2))}
             </span>
           </label>
         </td>
         <td className="px-6 py-4">
-          {isAuto || isReserva ? <span className="text-xs text-slate-400 italic block text-right">Auto</span> : (
+          {isAuto || isReserva ? <span className="text-xs text-text-muted italic block text-right">Auto</span> : (
             <div className="flex items-center justify-end gap-2">
-              {onEdit && <button onClick={onEdit} className="p-1 text-slate-400 hover:text-brand-500 dark:hover:text-emerald-400 transition-colors"><Edit2 className="w-4 h-4" /></button>}
-              {onDelete && <button onClick={onDelete} className="p-1 text-slate-400 hover:text-rose-500 dark:hover:text-rose-400 transition-colors"><Trash2 className="w-4 h-4" /></button>}
+              {onEdit && <button onClick={onEdit} className="p-1 text-text-muted hover:text-brand-500 transition-colors"><Edit2 className="w-4 h-4" /></button>}
+              {onDelete && <button onClick={onDelete} className="p-1 text-text-muted hover:text-rose-500 transition-colors"><Trash2 className="w-4 h-4" /></button>}
             </div>
           )}
         </td>
@@ -268,10 +268,10 @@ export default function TablaGastos({ mesId, perfil, datos, isAlejandro, configu
 
   return (
     <>
-      <div className="bg-white dark:bg-transparent rounded-xl shadow-sm border border-slate-200 dark:border-transparent overflow-hidden mb-6">
-        <div className="px-6 py-4 border-b border-slate-200 dark:border-white/10 flex justify-between items-center bg-slate-50 dark:bg-white/5">
-          <h2 className="text-lg font-bold text-slate-800 dark:text-white">Gastos ({isAlejandro ? 'Alejandro' : 'Esposa'})</h2>
-          <button onClick={() => setIsAdding(!isAdding)} className="flex items-center gap-2 text-sm bg-rose-500 dark:bg-rose-500/20 hover:bg-rose-600 dark:hover:bg-rose-500/30 text-white dark:text-rose-400 dark:border dark:border-rose-500/50 py-2 px-4 rounded-lg transition-colors">
+      <div className="bg-surface rounded-xl shadow-sm border border-border overflow-hidden mb-6">
+        <div className="px-6 py-4 border-b border-border flex justify-between items-center bg-surface-hover">
+          <h2 className="text-lg font-bold text-text-main">Gastos ({isAlejandro ? 'Alejandro' : 'Esposa'})</h2>
+          <button onClick={() => setIsAdding(!isAdding)} className="flex items-center gap-2 text-sm bg-rose-500 hover:bg-rose-600 text-white py-2 px-4 rounded-lg transition-colors">
             <Plus className="w-4 h-4" /> Imprevisto Mensual
           </button>
         </div>
@@ -279,7 +279,7 @@ export default function TablaGastos({ mesId, perfil, datos, isAlejandro, configu
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-slate-400 text-xs uppercase tracking-wider">
+              <tr className="bg-surface-hover text-text-muted text-xs uppercase tracking-wider">
                 <th className="px-6 py-3 font-semibold">Ítem</th>
                 <th className="px-6 py-3 font-semibold text-right">Total Mes</th>
                 <th className="px-6 py-3 font-semibold text-center">Quincena 1</th>
@@ -287,11 +287,11 @@ export default function TablaGastos({ mesId, perfil, datos, isAlejandro, configu
                 <th className="px-6 py-3 font-semibold text-right">Acciones</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-200 dark:divide-white/10 text-sm">
+            <tbody className="divide-y divide-border text-sm">
 
               {/* SECCIÓN 1: INMUTABLES */}
-              <tr className="bg-slate-50 dark:bg-white/5 border-t-2 border-slate-200 dark:border-white/10">
-                <td colSpan="5" className="px-6 py-2 text-xs font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider flex items-center gap-2"><Info className="w-4 h-4" /> Obligaciones de Ley</td>
+              <tr className="bg-surface-hover border-t-2 border-border">
+                <td colSpan="5" className="px-6 py-2 text-xs font-bold text-text-muted uppercase tracking-wider flex items-center gap-2"><Info className="w-4 h-4" /> Obligaciones de Ley</td>
               </tr>
               {inmutables.map(item => (
                 <FilaGasto
@@ -305,8 +305,8 @@ export default function TablaGastos({ mesId, perfil, datos, isAlejandro, configu
               ))}
 
               {/* SECCIÓN 2: FIJOS */}
-              <tr className="bg-slate-50 dark:bg-white/5 border-t-2 border-slate-200 dark:border-white/10">
-                <td colSpan="5" className="px-6 py-2 text-xs font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider flex items-center gap-2"><Info className="w-4 h-4" /> Gastos Fijos</td>
+              <tr className="bg-surface-hover border-t-2 border-border">
+                <td colSpan="5" className="px-6 py-2 text-xs font-bold text-text-muted uppercase tracking-wider flex items-center gap-2"><Info className="w-4 h-4" /> Gastos Fijos</td>
               </tr>
               {gastosFijos.map(gasto => (
                 <FilaGasto
@@ -320,8 +320,8 @@ export default function TablaGastos({ mesId, perfil, datos, isAlejandro, configu
               ))}
 
               {/* SECCIÓN 3: VARIABLES */}
-              <tr className="bg-slate-50 dark:bg-white/5 border-t-2 border-slate-200 dark:border-white/10">
-                <td colSpan="5" className="px-6 py-2 text-xs font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider flex items-center gap-2"><Info className="w-4 h-4" /> Gastos Variables (Mes en curso)</td>
+              <tr className="bg-surface-hover border-t-2 border-border">
+                <td colSpan="5" className="px-6 py-2 text-xs font-bold text-text-muted uppercase tracking-wider flex items-center gap-2"><Info className="w-4 h-4" /> Gastos Variables (Mes en curso)</td>
               </tr>
               {gastosVariables.map(gasto => (
                 <FilaGasto
@@ -335,26 +335,26 @@ export default function TablaGastos({ mesId, perfil, datos, isAlejandro, configu
               ))}
 
               {isAdding && (
-                <tr className="bg-rose-50 dark:bg-rose-500/10">
-                  <td className="px-6 py-4"><input type="text" placeholder="Ej. Regalo" className="w-full border-slate-300 dark:border-white/20 dark:bg-[#0B0F19] dark:text-white rounded p-1 text-sm focus:ring-rose-500" value={nuevoNombre} onChange={(e) => setNuevoNombre(e.target.value)} /></td>
+                <tr className="bg-rose-50">
+                  <td className="px-6 py-4"><input type="text" placeholder="Ej. Regalo" className="w-full border-border bg-base text-text-main rounded p-1 text-sm focus:ring-rose-500" value={nuevoNombre} onChange={(e) => setNuevoNombre(e.target.value)} /></td>
                   <td className="px-6 py-4">
-                    <input type="number" placeholder="Valor" className="w-full border-slate-300 dark:border-white/20 dark:bg-[#0B0F19] dark:text-white rounded p-1 text-sm text-right focus:ring-rose-500" value={nuevoValor} onChange={(e) => setNuevoValor(e.target.value)} />
+                    <input type="number" placeholder="Valor" className="w-full border-border bg-base text-text-main rounded p-1 text-sm text-right focus:ring-rose-500" value={nuevoValor} onChange={(e) => setNuevoValor(e.target.value)} />
                   </td>
-                  <td className="px-6 py-4 text-center text-slate-400 text-xs">Calc...</td>
-                  <td className="px-6 py-4 text-center text-slate-400 text-xs">Calc...</td>
+                  <td className="px-6 py-4 text-center text-text-muted text-xs">Calc...</td>
+                  <td className="px-6 py-4 text-center text-text-muted text-xs">Calc...</td>
                   <td className="px-6 py-4">
                     <div className="flex items-center justify-end gap-3">
-                      <label className="flex items-center gap-1 text-[11px] font-medium text-slate-600 dark:text-slate-300 cursor-pointer">
+                      <label className="flex items-center gap-1 text-[11px] font-medium text-text-muted cursor-pointer">
                         <input 
                           type="checkbox" 
-                          className="rounded text-rose-500 dark:bg-[#0B0F19] w-3.5 h-3.5 border-slate-300 dark:border-white/20" 
+                          className="rounded text-rose-500 bg-base w-3.5 h-3.5 border-border" 
                           checked={nuevoMensual} 
                           onChange={(e) => setNuevoMensual(e.target.checked)} 
                         /> Fijo cada mes
                       </label>
                       <div className="flex gap-1">
-                        <button onClick={handleAddVariable} className="p-1 text-green-600 dark:text-emerald-400 hover:bg-green-100 dark:hover:bg-emerald-500/20 rounded"><Check className="w-4 h-4" /></button>
-                        <button onClick={() => setIsAdding(false)} className="p-1 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-white/10 rounded"><X className="w-4 h-4" /></button>
+                        <button onClick={handleAddVariable} className="p-1 text-brand-600 hover:bg-brand-100 rounded"><Check className="w-4 h-4" /></button>
+                        <button onClick={() => setIsAdding(false)} className="p-1 text-text-muted hover:bg-surface-hover rounded"><X className="w-4 h-4" /></button>
                       </div>
                     </div>
                   </td>
@@ -362,12 +362,12 @@ export default function TablaGastos({ mesId, perfil, datos, isAlejandro, configu
               )}
 
               {!gastosVariables.length && !isAdding && (
-                <tr><td colSpan="5" className="px-6 py-4 text-center text-slate-400 italic">No hay imprevistos registrados este mes.</td></tr>
+                <tr><td colSpan="5" className="px-6 py-4 text-center text-text-muted italic">No hay imprevistos registrados este mes.</td></tr>
               )}
 
               {/* SECCIÓN 4: RESERVA */}
-              <tr className="bg-slate-50 dark:bg-white/5 border-t-2 border-slate-200 dark:border-white/10">
-                <td colSpan="5" className="px-6 py-2 text-xs font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider flex items-center gap-2"><Info className="w-4 h-4" /> Ahorro</td>
+              <tr className="bg-surface-hover border-t-2 border-border">
+                <td colSpan="5" className="px-6 py-2 text-xs font-bold text-text-muted uppercase tracking-wider flex items-center gap-2"><Info className="w-4 h-4" /> Ahorro</td>
               </tr>
               <FilaGasto
                 item={reserva}
@@ -380,20 +380,20 @@ export default function TablaGastos({ mesId, perfil, datos, isAlejandro, configu
             </tbody>
 
             {/* FOOTER DISPONIBLE */}
-            <tfoot className="bg-slate-50 dark:bg-white/5 border-t-2 border-slate-200 dark:border-white/10">
+            <tfoot className="bg-surface-hover border-t-2 border-border">
               <tr>
                 <td colSpan="5" className="px-6 py-6">
                   <div className="flex flex-col sm:flex-row justify-end items-end sm:items-center gap-8">
                     <div className="flex flex-col text-right">
-                      <span className="text-xs font-bold text-slate-400 dark:text-slate-400 uppercase tracking-wider mb-1">Total Gastos</span>
-                      <span className="text-xl font-bold text-rose-600 dark:text-rose-400">
+                      <span className="text-xs font-bold text-text-muted uppercase tracking-wider mb-1">Total Gastos</span>
+                      <span className="text-xl font-bold text-rose-600">
                         {formatter.format(granTotal)}
                       </span>
                     </div>
-                    <div className="h-10 w-px bg-slate-300 dark:bg-white/10 hidden sm:block"></div>
+                    <div className="h-10 w-px bg-border hidden sm:block"></div>
                     <div className="flex flex-col text-right">
-                      <span className="text-xs font-bold text-slate-400 dark:text-slate-400 uppercase tracking-wider mb-1">Disponible</span>
-                      <span className={`text-2xl font-black ${disponible >= 0 ? 'text-emerald-500 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
+                      <span className="text-xs font-bold text-text-muted uppercase tracking-wider mb-1">Disponible</span>
+                      <span className={`text-2xl font-black ${disponible >= 0 ? 'text-brand-500' : 'text-rose-600'}`}>
                         {formatter.format(disponible)}
                       </span>
                     </div>
@@ -407,18 +407,18 @@ export default function TablaGastos({ mesId, perfil, datos, isAlejandro, configu
 
       {/* Modal de Eliminación Inteligente */}
       {itemToDelete && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 dark:bg-slate-900/80 backdrop-blur-sm dark:backdrop-blur-md p-4">
-          <div className="bg-white dark:bg-[#0B0F19]/90 dark:backdrop-blur-2xl dark:border dark:border-white/10 rounded-2xl shadow-xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-md p-4">
+          <div className="bg-surface border border-border backdrop-blur-2xl rounded-2xl shadow-xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-200">
             <div className="p-6">
-              <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-2">Eliminar Gasto</h3>
-              <p className="text-slate-600 dark:text-slate-300">
+              <h3 className="text-lg font-bold text-text-main mb-2">Eliminar Gasto</h3>
+              <p className="text-text-muted">
                 ¿Cómo deseas eliminar <strong>{itemToDelete.nombre}</strong> por <strong>{formatter.format(itemToDelete.valor)}</strong>?
               </p>
             </div>
-            <div className="bg-slate-50 dark:bg-white/5 px-6 py-4 flex flex-col gap-3">
+            <div className="bg-surface-hover px-6 py-4 flex flex-col gap-3">
               <button 
                 onClick={() => confirmDelete('solo_mes')}
-                className="w-full bg-slate-200 dark:bg-white/10 hover:bg-slate-300 dark:hover:bg-white/20 text-slate-800 dark:text-white font-semibold py-2.5 rounded-lg transition-colors"
+                className="w-full bg-border hover:opacity-80 text-text-main font-semibold py-2.5 rounded-lg transition-colors"
               >
                 Solo este mes
               </button>
@@ -433,7 +433,7 @@ export default function TablaGastos({ mesId, perfil, datos, isAlejandro, configu
                   setItemToDelete(null);
                   setDeleteTargetArray('');
                 }}
-                className="w-full text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-white font-medium py-2 transition-colors mt-1"
+                className="w-full text-text-muted hover:text-text-main font-medium py-2 transition-colors mt-1"
               >
                 Cancelar
               </button>
