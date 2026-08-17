@@ -185,3 +185,4 @@ export default function ModuloMercado({ mesId, datos, configuracion }) {
       </div>
     </div>
   );
+}
