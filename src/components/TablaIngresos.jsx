@@ -118,15 +118,15 @@ export default function TablaIngresos({ mesId, perfil, datos, isAlejandro }) {
 
   return (
     <>
-      <div className="w-full overflow-hidden -mx-2 px-2 pb-4">
+      <div className="w-full overflow-hidden">
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="border-b border-white/[0.06] text-white/40 font-medium text-[11px] tracking-wider pb-2">
-              <th className="px-2 py-3 font-medium">Ítem</th>
-              <th className="px-2 py-3 font-medium text-right">Total Mes</th>
-              <th className="px-2 py-3 font-medium text-right">Quincena 1 (50%)</th>
-              <th className="px-2 py-3 font-medium text-right">Quincena 2 (50%)</th>
-              <th className="px-2 py-3 font-medium text-right">Acciones</th>
+              <th className="py-3 font-medium">Ítem</th>
+              <th className="py-3 font-medium text-right">Total Mes</th>
+              <th className="py-3 font-medium text-right">Quincena 1 (50%)</th>
+              <th className="py-3 font-medium text-right">Quincena 2 (50%)</th>
+              <th className="py-3 font-medium text-right">Acciones</th>
             </tr>
           </thead>
           <tbody className="text-sm">
@@ -134,20 +134,20 @@ export default function TablaIngresos({ mesId, perfil, datos, isAlejandro }) {
               if (editingId === ingreso.id) {
                 return (
                   <tr key={ingreso.id} className="bg-white/[0.02] border-b border-white/[0.04]">
-                    <td className="px-2 py-3">
+                    <td className="py-3">
                       <input type="text" className="w-full border border-white/[0.06] bg-transparent text-white/90 rounded p-1 text-sm outline-none focus:outline-none focus:ring-0 focus:ring-offset-0 transition-all" value={editNombre} onChange={(e) => setEditNombre(e.target.value)} />
                     </td>
-                    <td className="px-2 py-3">
+                    <td className="py-3">
                       <input type="number" className="w-full border border-white/[0.06] bg-transparent text-white/95 rounded p-1 text-sm text-right font-space font-semibold tabular-nums outline-none focus:outline-none focus:ring-0 focus:ring-offset-0 transition-all" value={editValor} onChange={(e) => setEditValor(e.target.value)} />
                     </td>
-                    <td className="px-2 py-3 text-right text-white/40 text-xs">Calc...</td>
-                    <td className="px-2 py-3 text-right text-white/40 text-xs">Calc...</td>
-                    <td className="px-2 py-3">
+                    <td className="py-3 text-right text-white/40 text-xs">Calc...</td>
+                    <td className="py-3 text-right text-white/40 text-xs">Calc...</td>
+                    <td className="py-3">
                       <div className="flex items-center justify-end gap-3">
                         <label className="flex items-center gap-1 text-[11px] font-medium text-white/60 cursor-pointer">
                           <input 
                             type="checkbox" 
-                            className="accent-[#10B981] w-4 h-4 outline-none focus:outline-none focus:ring-0 focus:ring-offset-0 border border-white/20 bg-white/5 rounded transition-all cursor-pointer" 
+                            className="cursor-pointer accent-emerald-500 rounded outline-none w-4 h-4 border border-white/20 bg-white/5 transition-all" 
                             checked={editFijoCadaMes} 
                             onChange={(e) => setEditFijoCadaMes(e.target.checked)} 
                           /> Fijo
@@ -163,17 +163,17 @@ export default function TablaIngresos({ mesId, perfil, datos, isAlejandro }) {
               }
               return (
                 <tr key={ingreso.id} className="hover:bg-white/[0.02] transition-colors duration-150 border-b border-white/[0.04]">
-                  <td className="px-2 py-3 text-white/90 font-sans text-sm">{ingreso.nombre}</td>
-                  <td className="px-2 py-3 text-right font-space font-semibold text-white/95 tabular-nums">
+                  <td className="py-3 text-white/90 font-sans text-sm">{ingreso.nombre}</td>
+                  <td className="py-3 text-right font-space font-semibold text-white/95 tabular-nums">
                     {formatter.format(ingreso.valor)}
                   </td>
-                  <td className="px-2 py-3 text-right font-space font-semibold text-white/60 tabular-nums">
+                  <td className="py-3 text-right font-space font-semibold text-white/60 tabular-nums">
                     {formatter.format(ingreso.valor / 2)}
                   </td>
-                  <td className="px-2 py-3 text-right font-space font-semibold text-white/60 tabular-nums">
+                  <td className="py-3 text-right font-space font-semibold text-white/60 tabular-nums">
                     {formatter.format(ingreso.valor / 2)}
                   </td>
-                  <td className="px-2 py-3">
+                  <td className="py-3">
                     <div className="flex items-center justify-end gap-2">
                       <button onClick={() => handleStartEdit(ingreso)} className="text-white/40 hover:text-white/90 transition-colors p-1 rounded-lg hover:bg-white/[0.04] outline-none focus:outline-none focus:ring-0"><Edit2 className="w-4 h-4" /></button>
                       <button onClick={() => setItemToDelete(ingreso)} className="text-white/40 hover:text-[#F43F5E] transition-colors p-1 rounded-lg hover:bg-white/[0.04] outline-none focus:outline-none focus:ring-0"><Trash2 className="w-4 h-4" /></button>
@@ -185,20 +185,20 @@ export default function TablaIngresos({ mesId, perfil, datos, isAlejandro }) {
 
             {isAdding && (
               <tr className="bg-white/[0.02] border-b border-white/[0.04]">
-                <td className="px-2 py-3">
+                <td className="py-3">
                   <input type="text" placeholder="Ej. Salario" className="w-full border border-white/[0.06] bg-transparent text-white/90 rounded p-1 text-sm outline-none focus:outline-none focus:ring-0 focus:ring-offset-0 transition-all" value={nuevoNombre} onChange={(e) => setNuevoNombre(e.target.value)} />
                 </td>
-                <td className="px-2 py-3">
+                <td className="py-3">
                   <input type="number" placeholder="Valor total" className="w-full border border-white/[0.06] bg-transparent text-white/95 rounded p-1 text-sm text-right font-space font-semibold tabular-nums outline-none focus:outline-none focus:ring-0 focus:ring-offset-0 transition-all" value={nuevoValor} onChange={(e) => setNuevoValor(e.target.value)} />
                 </td>
-                <td className="px-2 py-3 text-right text-white/40 text-xs">Calc...</td>
-                <td className="px-2 py-3 text-right text-white/40 text-xs">Calc...</td>
-                <td className="px-2 py-3">
+                <td className="py-3 text-right text-white/40 text-xs">Calc...</td>
+                <td className="py-3 text-right text-white/40 text-xs">Calc...</td>
+                <td className="py-3">
                   <div className="flex items-center justify-end gap-3">
                     <label className="flex items-center gap-1 text-[11px] font-medium text-white/60 cursor-pointer">
                       <input 
                         type="checkbox" 
-                        className="accent-[#10B981] w-4 h-4 outline-none focus:outline-none focus:ring-0 focus:ring-offset-0 border border-white/20 bg-white/5 rounded transition-all cursor-pointer" 
+                        className="cursor-pointer accent-emerald-500 rounded outline-none w-4 h-4 border border-white/20 bg-white/5 transition-all" 
                         checked={nuevoFijoCadaMes} 
                         onChange={(e) => setNuevoFijoCadaMes(e.target.checked)} 
                       /> Fijo
@@ -214,7 +214,7 @@ export default function TablaIngresos({ mesId, perfil, datos, isAlejandro }) {
             
             {!datos?.length && !isAdding && (
               <tr>
-                <td colSpan="5" className="px-2 py-8 text-center text-white/40 italic border-b border-white/[0.04]">No hay ingresos registrados aún.</td>
+                <td colSpan="5" className="py-8 text-center text-white/40 italic border-b border-white/[0.04]">No hay ingresos registrados aún.</td>
               </tr>
             )}
           </tbody>
