@@ -252,14 +252,18 @@ export default function App() {
             {/* Columna Izquierda */}
             <div className="lg:col-span-5 flex flex-col gap-6">
               
-              <NotchedBentoCard 
+              <BentoCard 
                 title="Ingresos"
-                actionLabel="+ Agregar"
-                onAction={() => console.log('Acción Agregar Ingreso: Por conectar al modal interno')}
+                actionSlot={
+                  <button className="flex items-center gap-1 px-4 py-1.5 rounded-full text-xs font-semibold bg-emerald-500/15 text-emerald-500 border border-emerald-500/30 hover:bg-emerald-500/25 transition-all shadow-sm outline-none focus:outline-none focus:ring-0">
+                    <Plus className="w-4 h-4" /> Agregar
+                  </button>
+                }
+                totalLabel="TOTAL INGRESOS"
                 totalAmount={formatter.format(perfilStats.ingresos)}
               >
                 <TablaIngresos mesId={mesSeleccionado} isAlejandro={isAle} datos={perfilData?.ingresos} />
-              </NotchedBentoCard>
+              </BentoCard>
 
               {isAle && (
                 <BentoCard title="Mercado (Alejandro)">
@@ -318,7 +322,18 @@ export default function App() {
 
             {/* Columna Derecha */}
             <div className="lg:col-span-7 flex flex-col gap-6">
-              <TablaGastos mesId={mesSeleccionado} isAlejandro={isAle} datos={perfilData} configuracion={data?.configuracion} />
+              <BentoCard 
+                title="Gastos Fijos & Obligaciones"
+                actionSlot={
+                  <button className="flex items-center gap-1 px-4 py-1.5 rounded-full text-xs font-semibold bg-rose-500/15 text-rose-500 border border-rose-500/30 hover:bg-rose-500/25 transition-all shadow-sm outline-none focus:outline-none focus:ring-0">
+                    <Plus className="w-4 h-4" /> Agregar
+                  </button>
+                }
+                totalLabel="TOTAL GASTOS"
+                totalAmount={formatter.format(perfilStats.gastos)}
+              >
+                <TablaGastos mesId={mesSeleccionado} isAlejandro={isAle} datos={perfilData} configuracion={data?.configuracion} />
+              </BentoCard>
             </div>
             
           </div>
