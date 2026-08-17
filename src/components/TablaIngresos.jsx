@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Plus, Edit2, Trash2, Check, X } from 'lucide-react';
 import { doc, updateDoc, arrayRemove } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
+import BentoCard from './ui/BentoCard';
 
 export default function TablaIngresos({ mesId, perfil, datos, isAlejandro }) {
   const [isAdding, setIsAdding] = useState(false);
@@ -118,7 +119,20 @@ export default function TablaIngresos({ mesId, perfil, datos, isAlejandro }) {
 
   return (
     <>
-      <div className="w-full overflow-hidden">
+      <BentoCard 
+        title="Ingresos"
+        actionSlot={
+          <button 
+            onClick={() => setIsAdding(true)}
+            className="flex items-center gap-1 px-4 py-1.5 rounded-full text-xs font-semibold bg-emerald-500/15 text-emerald-500 border border-emerald-500/30 hover:bg-emerald-500/25 transition-all shadow-sm outline-none focus:outline-none focus:ring-0"
+          >
+            <Plus className="w-4 h-4" /> Agregar
+          </button>
+        }
+        totalLabel="TOTAL INGRESOS"
+        totalAmount={formatter.format(totalCalculado)}
+      >
+        <div className="w-full overflow-hidden">
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="border-b border-white/[0.06] text-white/40 font-medium text-[11px] tracking-wider pb-2">
@@ -220,6 +234,7 @@ export default function TablaIngresos({ mesId, perfil, datos, isAlejandro }) {
           </tbody>
         </table>
       </div>
+      </BentoCard>
 
       {/* Modal de Eliminación Inteligente */}
       {itemToDelete && (
@@ -242,18 +257,3 @@ export default function TablaIngresos({ mesId, perfil, datos, isAlejandro }) {
                 onClick={() => confirmDelete('futuros')}
                 className="w-full bg-rose-500 hover:bg-rose-600 text-white font-semibold py-2.5 rounded-lg transition-colors outline-none focus:outline-none focus:ring-0"
               >
-                Este mes y futuros
-              </button>
-              <button 
-                onClick={() => setItemToDelete(null)}
-                className="w-full text-white/40 hover:text-white/90 font-medium py-2 transition-colors mt-1 outline-none focus:outline-none focus:ring-0"
-              >
-                Cancelar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </>
-  );
-}
