@@ -8,6 +8,7 @@ import BentoCard from './components/ui/BentoCard';
 import TablaIngresos from './components/TablaIngresos';
 import TablaGastos from './components/TablaGastos';
 import ModuloMercado from './components/ModuloMercado';
+import NotchedBentoCard from './components/ui/NotchedBentoCard';
 
 import { DEFAULT_MONTH, TEMPLATE_DATA } from './config/defaultTemplate';
 
@@ -251,7 +252,14 @@ export default function App() {
             {/* Columna Izquierda */}
             <div className="lg:col-span-5 flex flex-col gap-6">
               
-              <TablaIngresos mesId={mesSeleccionado} isAlejandro={isAle} datos={perfilData?.ingresos} />
+              <NotchedBentoCard 
+                title="Ingresos"
+                actionLabel="+ Agregar"
+                onAction={() => console.log('Acción Agregar Ingreso: Por conectar al modal interno')}
+                totalAmount={formatter.format(perfilStats.ingresos)}
+              >
+                <TablaIngresos mesId={mesSeleccionado} isAlejandro={isAle} datos={perfilData?.ingresos} />
+              </NotchedBentoCard>
 
               {isAle && (
                 <BentoCard title="Mercado (Alejandro)">
