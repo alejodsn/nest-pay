@@ -3,7 +3,25 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --color-base: #f8fafc;
+    --color-surface: #ffffff;
+    --color-surface-hover: #f1f5f9;
+    --color-text-main: #1e293b;
+    --color-text-muted: #64748b;
+    --color-border: #e2e8f0;
+  }
+
+  .dark {
+    --color-base: #0B0F19;
+    --color-surface: rgba(255, 255, 255, 0.05);
+    --color-surface-hover: rgba(255, 255, 255, 0.1);
+    --color-text-main: #ffffff;
+    --color-text-muted: #94a3b8;
+    --color-border: rgba(255, 255, 255, 0.1);
+  }
+
   body {
-    @apply antialiased text-slate-800 bg-slate-50;
+    @apply antialiased text-text-main bg-base;
   }
 }
