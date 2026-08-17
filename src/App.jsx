@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { doc, onSnapshot, setDoc, getDoc, collection, getDocs } from 'firebase/firestore';
 import { db } from './firebaseConfig';
-import { UserCircle2, Wallet, Sun, Moon } from 'lucide-react';
+import { UserCircle2, Wallet, Sun, Moon, Plus } from 'lucide-react';
+import { getWorkingDaysForMonth } from './utils/dateUtils';
 
-import ResumenGlobal from './components/ResumenGlobal';
+import BentoCard from './components/ui/BentoCard';
 import TablaIngresos from './components/TablaIngresos';
 import TablaGastos from './components/TablaGastos';
 import ModuloMercado from './components/ModuloMercado';
@@ -19,6 +20,8 @@ export default function App() {
   const [isDarkMode, setIsDarkMode] = useState(() => {
     return localStorage.getItem('theme') === 'dark';
   });
+
+  const [workingDays, setWorkingDays] = useState({ q1Days: 0, q2Days: 0 });
 
   useEffect(() => {
     if (isDarkMode) {
@@ -86,17 +89,76 @@ export default function App() {
     });
   }, [mesSeleccionado]);
 
+  useEffect(() => {
+    if (mesSeleccionado) {
+      getWorkingDaysForMonth(mesSeleccionado).then(days => setWorkingDays(days));
+    }
+  }, [mesSeleccionado]);
+
+  // Cálculos matemáticos extraídos para alimentar el Bento Grid centralizadamente
+  const sumItems = (items = []) => items.reduce((acc, item) => acc + (Number(item.valor) || 0), 0);
+
+  const stats = useMemo(() => {
+    if (!data) return { ingresosTotales: 0, gastosTotales: 0, disponibleFamiliar: 0, ale: { ingresos: 0, gastos: 0, totalTransporte: 0 }, esp: { ingresos: 0, gastos: 0, totalTransporte: 0 } };
+
+    const calcPerfil = (perfilData, isAlejandro) => {
+      if (!perfilData) return { ingresos: 0, gastos: 0, totalTransporte: 0 };
+
+      const ingresosTotales = sumItems(perfilData.ingresos);
+      const ingresosFijos = perfilData.ingresos?.filter(i => i.fijo) || [];
+      const totalIngresosFijos = sumItems(ingresosFijos);
+
+      const configuracion = data.configuracion || {};
+      const tarifaTransporte = isAlejandro 
+        ? (configuracion.tarifa_integrado || 4715) * 2 
+        : (configuracion.tarifa_metro || 3820) * 2;
+      
+      const totalTransporte = (workingDays.q1Days + workingDays.q2Days) * tarifaTransporte;
+      const totalDiezmo = totalIngresosFijos * 0.10;
+      const totalSalud = totalIngresosFijos * 0.04;
+      const totalPension = totalIngresosFijos * 0.04;
+      const totalInmutables = totalDiezmo + totalSalud + totalPension + totalTransporte;
+
+      const totalFijos = sumItems(perfilData.gastos_fijos);
+      const totalVariables = sumItems(perfilData.gastos_variables);
+      const totalReserva = Number(perfilData.reserva?.valor) || 0;
+      
+      const mercadoGastado = perfilData.mercado_tickets?.reduce((acc, t) => acc + (Number(t.valor) || 0), 0) || 0;
+
+      const gastosTotales = totalInmutables + totalFijos + totalVariables + totalReserva + mercadoGastado;
+
+      return { ingresos: ingresosTotales, gastos: gastosTotales, totalTransporte };
+    };
+
+    const aleStats = calcPerfil(data.alejandro, true);
+    const espStats = calcPerfil(data.esposa, false);
+
+    return {
+      ingresosTotales: aleStats.ingresos + espStats.ingresos,
+      gastosTotales: aleStats.gastos + espStats.gastos,
+      disponibleFamiliar: (aleStats.ingresos + espStats.ingresos) - (aleStats.gastos + espStats.gastos),
+      ale: aleStats,
+      esp: espStats
+    };
+  }, [data, workingDays]);
+
+  const formatter = new Intl.NumberFormat('es-CO', {
+    style: 'currency',
+    currency: 'COP',
+    minimumFractionDigits: 0
+  });
+
   if (loading) {
     return (
       <div className={isDarkMode ? 'dark' : ''}>
         <div className="min-h-screen flex items-center justify-center bg-base transition-colors duration-300 relative overflow-hidden">
-          {/* Auras de fondo (Glassmorphism) */}
-          <div className="hidden dark:block absolute top-[-10%] left-[-10%] w-[40rem] h-[40rem] bg-violet-600 rounded-full mix-blend-screen filter blur-[120px] opacity-20 pointer-events-none"></div>
-          <div className="hidden dark:block absolute bottom-[-10%] right-[-10%] w-[40rem] h-[40rem] bg-blue-600 rounded-full mix-blend-screen filter blur-[120px] opacity-20 pointer-events-none"></div>
-
+          {/* Halos luminosos (Efecto Aurora) */}
+          <div className="hidden dark:block absolute top-[-10%] left-[-10%] w-[40rem] h-[40rem] bg-violet-600 rounded-full mix-blend-screen filter blur-[140px] opacity-20 pointer-events-none"></div>
+          <div className="hidden dark:block absolute bottom-[-10%] right-[-10%] w-[40rem] h-[40rem] bg-blue-600 rounded-full mix-blend-screen filter blur-[140px] opacity-20 pointer-events-none"></div>
+          
           <div className="flex flex-col items-center gap-4 text-text-muted relative z-10">
-            <div className="w-8 h-8 border-4 border-brand-500 border-t-transparent rounded-full animate-spin"></div>
-            <p className="font-medium">Cargando Familia Financiera...</p>
+            <div className="w-8 h-8 border-4 border-[#10B981] border-t-transparent rounded-full animate-spin"></div>
+            <p className="font-medium font-space">Cargando Familia Financiera...</p>
           </div>
         </div>
       </div>
@@ -105,122 +167,191 @@ export default function App() {
 
   const isAle = perfilActivo === 'alejandro';
   const perfilData = isAle ? data?.alejandro : data?.esposa;
+  const perfilStats = isAle ? stats.ale : stats.esp;
+  const perfilDisponible = perfilStats.ingresos - perfilStats.gastos;
 
   return (
     <div className={isDarkMode ? 'dark' : ''}>
-      <div className="min-h-screen w-full px-4 py-8 bg-base transition-colors duration-300 font-sans selection:bg-brand-500/30 relative overflow-hidden">
-        {/* Auras de fondo (Glassmorphism) */}
-        <div className="hidden dark:block absolute top-[-10%] left-[-10%] w-[40rem] h-[40rem] bg-violet-600 rounded-full mix-blend-screen filter blur-[120px] opacity-20 pointer-events-none"></div>
-        <div className="hidden dark:block absolute bottom-[-10%] right-[-10%] w-[40rem] h-[40rem] bg-blue-600 rounded-full mix-blend-screen filter blur-[120px] opacity-20 pointer-events-none"></div>
-
-        <div className="max-w-[1400px] mx-auto">
-          {/* Header Unificado / Floating Bar */}
-          <header className="mb-8 bg-surface backdrop-blur-xl dark:backdrop-blur-2xl p-5 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-border relative flex flex-col gap-6 transition-all duration-300 z-10">
-
-            {/* Fila Superior (Top - Centrado absoluto) */}
-            <div className="absolute top-5 left-1/2 transform -translate-x-1/2 flex items-center gap-3">
-              <div className="w-12 h-12 bg-gradient-to-br from-brand-500 to-brand-700 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-brand-500/30">
+      <div className="min-h-screen w-full bg-base text-text-main p-4 md:p-8 font-sans relative overflow-hidden transition-colors duration-300">
+        
+        {/* 1. CANVAS Y EFECTO AURORA */}
+        <div className="hidden dark:block absolute top-[-10%] left-[-10%] w-[40rem] h-[40rem] bg-violet-600 rounded-full mix-blend-screen filter blur-[140px] opacity-20 pointer-events-none"></div>
+        <div className="hidden dark:block absolute bottom-[-10%] right-[-10%] w-[40rem] h-[40rem] bg-blue-600 rounded-full mix-blend-screen filter blur-[140px] opacity-20 pointer-events-none"></div>
+        
+        <div className="max-w-[1400px] mx-auto relative z-10">
+          
+          {/* 2. ENCABEZADO SUPERIOR DESESTRUCTURADO */}
+          <header className="flex justify-between items-center mb-8 flex-wrap gap-4">
+            
+            {/* Izquierda */}
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-gradient-to-br from-[#10B981] to-emerald-700 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-[#10B981]/20">
                 <Wallet className="w-7 h-7" />
               </div>
-              <h1 className="text-2xl font-extrabold text-text-main tracking-tight">Nest Pay</h1>
-            </div>
-
-            {/* Fila Inferior (Dividida en 2 columnas, flex-between) */}
-            <div className="flex flex-col xl:flex-row justify-between items-start xl:items-end mt-20 xl:mt-6 gap-6">
-
-              {/* Columna Izquierda */}
-              <div className="flex flex-col gap-5">
-                <div className="flex flex-wrap items-center gap-4">
-                  <div className="flex bg-surface-hover p-1.5 rounded-2xl w-max border border-border dark:backdrop-blur-md">
-                    <button
-                      onClick={() => setPerfilActivo('alejandro')}
-                      className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold text-sm transition-all duration-300 ${isAle ? 'bg-surface text-brand-600 shadow-sm border border-border' : 'text-text-muted hover:text-text-main border border-transparent'
-                        }`}
-                    >
-                      <UserCircle2 className="w-5 h-5" /> Alejandro
-                    </button>
-                    <button
-                      onClick={() => setPerfilActivo('esposa')}
-                      className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold text-sm transition-all duration-300 ${!isAle ? 'bg-surface text-rose-500 shadow-sm border border-border' : 'text-text-muted hover:text-text-main border border-transparent'
-                        }`}
-                    >
-                      <UserCircle2 className="w-5 h-5" /> Esposa
-                    </button>
-                  </div>
-
-                  <button
-                    onClick={() => setIsDarkMode(!isDarkMode)}
-                    className="p-3.5 bg-surface border border-border rounded-2xl text-text-muted hover:text-brand-500 transition-all shadow-sm flex items-center justify-center group dark:backdrop-blur-md"
-                    aria-label="Toggle Dark Mode"
-                  >
-                    {isDarkMode ? <Sun className="w-5 h-5 group-hover:rotate-90 transition-transform duration-300" /> : <Moon className="w-5 h-5 group-hover:-rotate-12 transition-transform duration-300" />}
-                  </button>
-                </div>
-
+              <div className="flex flex-col">
+                <h1 className="text-2xl font-extrabold font-space text-text-main tracking-tight leading-none">Nest Pay</h1>
                 <select
-                  className="text-2xl font-extrabold text-text-main bg-transparent border-none cursor-pointer focus:ring-0 outline-none p-0 transition-colors duration-300"
+                  className="text-sm font-bold text-text-muted bg-transparent border-none cursor-pointer focus:ring-0 outline-none p-0 mt-1"
                   value={mesSeleccionado}
                   onChange={(e) => setMesSeleccionado(e.target.value)}
                 >
-                  <option value={DEFAULT_MONTH} className="text-base bg-base">Mes en curso ({DEFAULT_MONTH})</option>
+                  <option value={DEFAULT_MONTH} className="bg-base">Mes actual ({DEFAULT_MONTH})</option>
                   {mesesDisponibles
                     .filter(mes => mes !== DEFAULT_MONTH)
                     .map(mes => (
-                      <option key={mes} value={mes} className="text-base bg-base">{mes}</option>
+                      <option key={mes} value={mes} className="bg-base">{mes}</option>
                     ))}
                 </select>
               </div>
-
-              {/* Columna Derecha */}
-              <div className="flex flex-col items-end gap-3 w-full xl:w-auto">
-                <p className="text-sm font-bold tracking-widest text-text-muted uppercase">
-                  Presupuesto {mesSeleccionado.split('-')[0]}
-                </p>
-                <div className="w-full xl:w-auto bg-surface rounded-2xl p-1 shadow-sm border border-border backdrop-blur-sm dark:backdrop-blur-2xl">
-                  <ResumenGlobal data={data} mesSeleccionado={mesSeleccionado} />
-                </div>
-              </div>
             </div>
 
+            {/* Centro */}
+            <div className="flex bg-surface-hover p-1.5 rounded-full border border-border backdrop-blur-md shadow-sm">
+              <button
+                onClick={() => setPerfilActivo('alejandro')}
+                className={`flex items-center gap-2 px-6 py-2 rounded-full font-bold text-sm transition-all duration-300 ${isAle ? 'bg-surface text-[#10B981] shadow-sm border border-border' : 'text-text-muted hover:text-text-main border border-transparent'}`}
+              >
+                <UserCircle2 className="w-5 h-5" /> Alejandro
+              </button>
+              <button
+                onClick={() => setPerfilActivo('esposa')}
+                className={`flex items-center gap-2 px-6 py-2 rounded-full font-bold text-sm transition-all duration-300 ${!isAle ? 'bg-surface text-[#F43F5E] shadow-sm border border-border' : 'text-text-muted hover:text-text-main border border-transparent'}`}
+              >
+                <UserCircle2 className="w-5 h-5" /> Esposa
+              </button>
+            </div>
+
+            {/* Derecha */}
+            <button 
+              onClick={() => setIsDarkMode(!isDarkMode)}
+              className="p-3 bg-surface border border-border rounded-full text-text-muted hover:text-[#10B981] transition-all shadow-sm flex items-center justify-center group dark:backdrop-blur-md"
+              aria-label="Toggle Dark Mode"
+            >
+              {isDarkMode ? <Sun className="w-5 h-5 group-hover:rotate-90 transition-transform duration-300" /> : <Moon className="w-5 h-5 group-hover:-rotate-12 transition-transform duration-300" />}
+            </button>
+            
           </header>
 
-          {/* Contenido Dinámico - Bento Grid */}
-          <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 animate-fade-in relative z-0">
+          {/* 3. FILA HERO: MÉTRICAS GLOBALES */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <BentoCard title="Ingresos Totales (Familia)" badge="+" actionSlot={<span className="w-2 h-2 rounded-full bg-[#10B981] shadow-[0_0_8px_#10B981]"></span>}>
+              <p className="text-4xl font-bold text-[#10B981] font-space mt-2">{formatter.format(stats.ingresosTotales)}</p>
+            </BentoCard>
+            
+            <BentoCard title="Gastos Totales (Familia)" badge="-" actionSlot={<span className="w-2 h-2 rounded-full bg-[#F43F5E] shadow-[0_0_8px_#F43F5E]"></span>}>
+              <p className="text-4xl font-bold text-[#F43F5E] font-space mt-2">{formatter.format(stats.gastosTotales)}</p>
+            </BentoCard>
+            
+            <BentoCard title="Disponible Familiar" badge="Neto" className="shadow-[0_0_30px_rgba(16,185,129,0.05)] dark:shadow-[0_0_40px_rgba(16,185,129,0.15)] border-[#10B981]/20">
+              <p className="text-4xl font-bold text-text-main font-space mt-2">{formatter.format(stats.disponibleFamiliar)}</p>
+            </BentoCard>
+          </div>
 
+          {/* 4. BALANCE OPERATIVO */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
+            
             {/* Columna Izquierda */}
-            <div className="xl:col-span-5 flex flex-col gap-8">
-              <div className="rounded-[2.5rem] bg-surface backdrop-blur-xl dark:backdrop-blur-2xl border border-border shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.12)] p-6 transition-all duration-300">
-                <TablaIngresos
-                  mesId={mesSeleccionado}
-                  isAlejandro={isAle}
-                  datos={perfilData?.ingresos}
-                />
-              </div>
+            <div className="lg:col-span-5 flex flex-col gap-6">
+              <BentoCard 
+                title="Ingresos" 
+                actionSlot={
+                  <button className="flex items-center gap-1 px-3 py-1.5 bg-surface-hover border border-border rounded-full text-xs font-bold hover:bg-brand-emerald/10 hover:text-[#10B981] transition-colors">
+                    <Plus className="w-3 h-3" /> Agregar
+                  </button>
+                }
+                footerSlot={
+                  <div className="flex justify-between items-center text-sm font-bold text-text-main pt-2">
+                    <span className="uppercase tracking-wider text-xs text-text-muted">Total Ingresos</span>
+                    <span className="text-lg">{formatter.format(perfilStats.ingresos)}</span>
+                  </div>
+                }
+              >
+                <div className="-mx-2">
+                  <TablaIngresos mesId={mesSeleccionado} isAlejandro={isAle} datos={perfilData?.ingresos} />
+                </div>
+              </BentoCard>
 
               {isAle && (
-                <div className="rounded-[2.5rem] bg-surface backdrop-blur-xl dark:backdrop-blur-2xl border border-border shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.12)] p-6 transition-all duration-300">
-                  <ModuloMercado
-                    mesId={mesSeleccionado}
-                    datos={perfilData}
-                    configuracion={data?.configuracion}
-                  />
-                </div>
+                <BentoCard title="Mercado (Alejandro)">
+                  <div className="-mx-2">
+                    <ModuloMercado mesId={mesSeleccionado} datos={perfilData} configuracion={data?.configuracion} />
+                  </div>
+                </BentoCard>
               )}
+
+              <BentoCard title="Transporte (T+1)" badge="Proyección">
+                <p className="text-text-muted text-sm mt-2">Reserva estimada de transporte para el mes siguiente basada en días hábiles.</p>
+                <p className="text-3xl font-bold text-text-main mt-4 font-space">{formatter.format(perfilStats.totalTransporte)}</p>
+              </BentoCard>
             </div>
 
             {/* Columna Derecha */}
-            <div className="xl:col-span-7">
-              <div className="rounded-[2.5rem] bg-surface backdrop-blur-xl dark:backdrop-blur-2xl border border-border shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.12)] p-6 h-full transition-all duration-300">
-                <TablaGastos
-                  mesId={mesSeleccionado}
-                  isAlejandro={isAle}
-                  datos={perfilData}
-                  configuracion={data?.configuracion}
-                />
-              </div>
+            <div className="lg:col-span-7 flex flex-col gap-6">
+              <BentoCard 
+                title="Gastos Fijos & Obligaciones"
+                actionSlot={
+                  <button className="flex items-center gap-1 px-3 py-1.5 bg-surface-hover border border-border rounded-full text-xs font-bold hover:bg-[#F43F5E]/10 hover:text-[#F43F5E] transition-colors">
+                    <Plus className="w-3 h-3" /> Agregar
+                  </button>
+                }
+                footerSlot={
+                  <div className="flex justify-between items-center text-sm font-bold text-text-main pt-2">
+                    <span className="uppercase tracking-wider text-xs text-text-muted">Total Gastos</span>
+                    <span className="text-lg">{formatter.format(perfilStats.gastos)}</span>
+                  </div>
+                }
+              >
+                <div className="-mx-2">
+                  <TablaGastos mesId={mesSeleccionado} isAlejandro={isAle} datos={perfilData} configuracion={data?.configuracion} />
+                </div>
+              </BentoCard>
             </div>
-
+            
           </div>
+
+          {/* 5. BANNER DISPONIBLE DEL PERFIL */}
+          <div className="bg-gradient-to-r from-[#10B981]/10 to-transparent border border-[#10B981]/20 rounded-3xl p-6 mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 backdrop-blur-xl">
+            <div>
+              <p className="text-[#10B981] font-bold uppercase tracking-wider text-sm mb-1">Disponible Neto ({isAle ? 'Alejandro' : 'Esposa'})</p>
+              <p className="text-text-muted text-sm">Balance final del perfil tras restar obligaciones y reservas a los ingresos totales.</p>
+            </div>
+            <p className="text-4xl font-extrabold text-[#10B981] font-space">{formatter.format(perfilDisponible)}</p>
+          </div>
+
+          {/* 6. FILA INFERIOR: GESTIÓN OPERATIVA */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <BentoCard title="Pendientes" badge="0 Tareas">
+              <div className="flex flex-col items-center justify-center py-8 text-text-muted">
+                <p className="text-sm">No hay pagos pendientes</p>
+              </div>
+            </BentoCard>
+            
+            <BentoCard 
+              title="Imprevistos" 
+              actionSlot={
+                <button className="flex items-center gap-1 px-3 py-1.5 bg-surface-hover border border-border rounded-full text-xs font-bold hover:bg-[#F43F5E]/10 hover:text-[#F43F5E] transition-colors">
+                  <Plus className="w-3 h-3" /> Agregar
+                </button>
+              }
+            >
+              <div className="flex flex-col items-center justify-center py-8 text-text-muted">
+                <p className="text-sm">Sin imprevistos registrados</p>
+              </div>
+            </BentoCard>
+            
+            <BentoCard title="Ahorros" badge="Meta">
+              <div className="flex flex-col gap-2 mt-4">
+                <div className="flex justify-between text-sm">
+                  <span className="text-text-muted">Progreso Global</span>
+                  <span className="font-bold text-text-main">0%</span>
+                </div>
+                <div className="h-2 w-full bg-surface-hover border border-border rounded-full overflow-hidden">
+                  <div className="h-full bg-[#10B981] w-0"></div>
+                </div>
+              </div>
+            </BentoCard>
+          </div>
+
         </div>
       </div>
     </div>
