@@ -3,6 +3,7 @@ import { Plus, Trash2, Check, X, Info, Edit2 } from 'lucide-react';
 import { doc, updateDoc, arrayRemove } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 import { getWorkingDaysForMonth } from '../utils/dateUtils';
+import BentoCard from './ui/BentoCard';
 
 export default function TablaGastos({ mesId, perfil, datos, isAlejandro, configuracion }) {
   const [isAdding, setIsAdding] = useState(false);
@@ -265,7 +266,20 @@ export default function TablaGastos({ mesId, perfil, datos, isAlejandro, configu
 
   return (
     <>
-      <div className="w-full overflow-hidden">
+      <BentoCard 
+        title="Gastos Fijos & Obligaciones"
+        actionSlot={
+          <button 
+            onClick={() => setIsAdding(!isAdding)}
+            className="flex items-center gap-1 px-4 py-1.5 rounded-full text-xs font-semibold bg-rose-500/15 text-rose-500 border border-rose-500/30 hover:bg-rose-500/25 transition-all shadow-sm outline-none focus:outline-none focus:ring-0"
+          >
+            <Plus className="w-4 h-4" /> Agregar
+          </button>
+        }
+        totalLabel="TOTAL GASTOS"
+        totalAmount={formatter.format(granTotal)}
+      >
+        <div className="w-full overflow-hidden">
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="border-b border-white/[0.06] text-white/40 font-medium text-[11px] tracking-wider pb-2">
@@ -369,6 +383,7 @@ export default function TablaGastos({ mesId, perfil, datos, isAlejandro, configu
           </tbody>
         </table>
       </div>
+      </BentoCard>
 
       {/* Modal de Eliminación Inteligente */}
       {itemToDelete && (
