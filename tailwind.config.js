@@ -7,20 +7,19 @@ export default {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['Space Grotesk', 'sans-serif'],
+        space: ['Space Grotesk', 'sans-serif'],
+      },
       colors: {
         base: 'var(--color-base)',
         surface: 'var(--color-surface)',
         'surface-hover': 'var(--color-surface-hover)',
+        border: 'var(--color-border)',
         'text-main': 'var(--color-text-main)',
         'text-muted': 'var(--color-text-muted)',
-        border: 'var(--color-border)',
-        brand: {
-          50: '#f0fdf4',
-          100: '#dcfce7',
-          500: '#22c55e',
-          600: '#16a34a',
-          900: '#14532d',
-        }
+        'brand-emerald': '#10B981',
+        'brand-rose': '#F43F5E'
       }
     },
   },
