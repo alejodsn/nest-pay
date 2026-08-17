@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Plus, Edit2, Trash2, Check, X } from 'lucide-react';
 import { doc, updateDoc, arrayRemove } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
+import BentoCard from './ui/BentoCard';
 
 export default function TablaIngresos({ mesId, perfil, datos, isAlejandro }) {
   const [isAdding, setIsAdding] = useState(false);
@@ -114,119 +115,130 @@ export default function TablaIngresos({ mesId, perfil, datos, isAlejandro }) {
     }
   };
 
+  const totalCalculado = datos?.reduce((sum, item) => sum + (Number(item.valor) || 0), 0) || 0;
+
   return (
     <>
-      <div className="w-full flex justify-end mb-4">
-        <button 
-          onClick={() => setIsAdding(!isAdding)}
-          className="flex items-center gap-1 rounded-full px-4 py-1.5 text-xs font-semibold bg-[#10B981]/15 text-[#10B981] border border-[#10B981]/30 hover:bg-[#10B981]/25 transition-all shadow-sm"
-        >
-          <Plus className="w-4 h-4" /> Agregar
-        </button>
-      </div>
-
-      <div className="overflow-x-auto w-full">
-        <table className="w-full text-left border-collapse">
-          <thead>
-            <tr className="text-xs uppercase tracking-wider text-text-muted font-semibold border-b border-border/40 pb-2">
-              <th className="px-4 py-3 pb-2 font-semibold">Ítem</th>
-              <th className="px-4 py-3 pb-2 font-semibold text-right">Total Mes</th>
-              <th className="px-4 py-3 pb-2 font-semibold text-right">Quincena 1 (50%)</th>
-              <th className="px-4 py-3 pb-2 font-semibold text-right">Quincena 2 (50%)</th>
-              <th className="px-4 py-3 pb-2 font-semibold text-right">Acciones</th>
-            </tr>
-          </thead>
-          <tbody className="text-sm">
-            {datos?.map((ingreso) => {
-              if (editingId === ingreso.id) {
-                return (
-                  <tr key={ingreso.id} className="bg-surface-hover/60 border-b border-border/30">
-                    <td className="px-4 py-4">
-                      <input type="text" className="w-full border-border bg-base text-text-main rounded p-1 text-sm focus:ring-[#10B981]" value={editNombre} onChange={(e) => setEditNombre(e.target.value)} />
-                    </td>
-                    <td className="px-4 py-4">
-                      <input type="number" className="w-full border-border bg-base text-text-main rounded p-1 text-sm text-right focus:ring-[#10B981] tabular-nums font-semibold tracking-tight" value={editValor} onChange={(e) => setEditValor(e.target.value)} />
-                    </td>
-                    <td className="px-4 py-4 text-right text-text-muted text-xs">Calc...</td>
-                    <td className="px-4 py-4 text-right text-text-muted text-xs">Calc...</td>
-                    <td className="px-4 py-4">
-                      <div className="flex items-center justify-end gap-3">
-                        <label className="flex items-center gap-1 text-[11px] font-medium text-text-muted cursor-pointer">
-                          <input 
-                            type="checkbox" 
-                            className="rounded accent-[#10B981] bg-base w-3.5 h-3.5 border-border/40" 
-                            checked={editFijoCadaMes} 
-                            onChange={(e) => setEditFijoCadaMes(e.target.checked)} 
-                          /> Fijo
-                        </label>
-                        <div className="flex gap-1">
-                          <button onClick={handleSaveEdit} className="p-1 text-[#10B981] hover:bg-surface-hover rounded-lg transition-colors"><Check className="w-4 h-4" /></button>
-                          <button onClick={() => setEditingId(null)} className="p-1 text-text-muted hover:bg-surface-hover rounded-lg transition-colors"><X className="w-4 h-4" /></button>
+      <BentoCard 
+        title="Ingresos"
+        actionSlot={
+          <button 
+            onClick={() => setIsAdding(!isAdding)}
+            className="flex items-center gap-1 rounded-full px-4 py-1.5 text-xs font-semibold bg-[#10B981]/15 text-[#10B981] border border-[#10B981]/30 hover:bg-[#10B981]/25 shadow-lg backdrop-blur-md transition-all focus:outline-none focus:ring-1 focus:ring-[#10B981]/40"
+          >
+            <Plus className="w-4 h-4" /> Agregar
+          </button>
+        }
+        footerSlot={
+          <>
+            <span className="uppercase tracking-wider text-xs text-text-muted">Total Ingresos</span>
+            <span className="text-lg text-text-main tabular-nums tracking-tight">{formatter.format(totalCalculado)}</span>
+          </>
+        }
+      >
+        <div className="overflow-x-auto w-full -mx-2 px-2 pb-4">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="text-xs uppercase tracking-wider text-text-muted font-semibold border-b border-border/40 pb-2">
+                <th className="px-4 py-3 pb-2 font-semibold">Ítem</th>
+                <th className="px-4 py-3 pb-2 font-semibold text-right">Total Mes</th>
+                <th className="px-4 py-3 pb-2 font-semibold text-right">Quincena 1 (50%)</th>
+                <th className="px-4 py-3 pb-2 font-semibold text-right">Quincena 2 (50%)</th>
+                <th className="px-4 py-3 pb-2 font-semibold text-right">Acciones</th>
+              </tr>
+            </thead>
+            <tbody className="text-sm">
+              {datos?.map((ingreso) => {
+                if (editingId === ingreso.id) {
+                  return (
+                    <tr key={ingreso.id} className="relative overflow-hidden bg-surface-hover/60 border-b border-border/30">
+                      <td className="px-4 py-4">
+                        <input type="text" className="w-full border border-border/40 bg-base text-text-main rounded p-1 text-sm focus:outline-none focus:ring-1 focus:ring-[#10B981]/40 transition-all" value={editNombre} onChange={(e) => setEditNombre(e.target.value)} />
+                      </td>
+                      <td className="px-4 py-4">
+                        <input type="number" className="w-full border border-border/40 bg-base text-text-main rounded p-1 text-sm text-right tabular-nums font-semibold tracking-tight focus:outline-none focus:ring-1 focus:ring-[#10B981]/40 transition-all" value={editValor} onChange={(e) => setEditValor(e.target.value)} />
+                      </td>
+                      <td className="px-4 py-4 text-right text-text-muted text-xs">Calc...</td>
+                      <td className="px-4 py-4 text-right text-text-muted text-xs">Calc...</td>
+                      <td className="px-4 py-4">
+                        <div className="flex items-center justify-end gap-3">
+                          <label className="flex items-center gap-1 text-[11px] font-medium text-text-muted cursor-pointer">
+                            <input 
+                              type="checkbox" 
+                              className="rounded accent-[#10B981] bg-base w-3.5 h-3.5 border-border/40 focus:outline-none focus:ring-1 focus:ring-[#10B981]/40" 
+                              checked={editFijoCadaMes} 
+                              onChange={(e) => setEditFijoCadaMes(e.target.checked)} 
+                            /> Fijo
+                          </label>
+                          <div className="flex gap-1">
+                            <button onClick={handleSaveEdit} className="p-1 text-[#10B981] hover:bg-surface-hover rounded-lg transition-colors focus:outline-none focus:ring-1 focus:ring-[#10B981]/40"><Check className="w-4 h-4" /></button>
+                            <button onClick={() => setEditingId(null)} className="p-1 text-text-muted hover:bg-surface-hover rounded-lg transition-colors focus:outline-none focus:ring-1 focus:ring-border/40"><X className="w-4 h-4" /></button>
+                          </div>
                         </div>
+                      </td>
+                    </tr>
+                  );
+                }
+                return (
+                  <tr key={ingreso.id} className="relative overflow-hidden hover:bg-surface-hover/60 transition-colors duration-150 border-b border-border/30">
+                    <td className="px-4 py-4 font-medium text-text-main">{ingreso.nombre}</td>
+                    <td className="px-4 py-4 text-right text-text-main tabular-nums font-semibold tracking-tight">
+                      {formatter.format(ingreso.valor)}
+                    </td>
+                    <td className="px-4 py-4 text-right text-text-muted tabular-nums font-semibold tracking-tight">
+                      {formatter.format(ingreso.valor / 2)}
+                    </td>
+                    <td className="px-4 py-4 text-right text-text-muted tabular-nums font-semibold tracking-tight">
+                      {formatter.format(ingreso.valor / 2)}
+                    </td>
+                    <td className="px-4 py-4">
+                      <div className="flex items-center justify-end gap-2">
+                        <button onClick={() => handleStartEdit(ingreso)} className="text-text-muted hover:text-text-main transition-colors p-1 rounded-lg hover:bg-surface-hover focus:outline-none focus:ring-1 focus:ring-border/40"><Edit2 className="w-4 h-4" /></button>
+                        <button onClick={() => setItemToDelete(ingreso)} className="text-text-muted hover:text-rose-500 transition-colors p-1 rounded-lg hover:bg-surface-hover focus:outline-none focus:ring-1 focus:ring-rose-500/40"><Trash2 className="w-4 h-4" /></button>
                       </div>
                     </td>
                   </tr>
                 );
-              }
-              return (
-                <tr key={ingreso.id} className="hover:bg-surface-hover/60 transition-colors duration-150 border-b border-border/30">
-                  <td className="px-4 py-4 font-medium text-text-main">{ingreso.nombre}</td>
-                  <td className="px-4 py-4 text-right text-text-main tabular-nums font-semibold tracking-tight">
-                    {formatter.format(ingreso.valor)}
-                  </td>
-                  <td className="px-4 py-4 text-right text-text-muted tabular-nums font-semibold tracking-tight">
-                    {formatter.format(ingreso.valor / 2)}
-                  </td>
-                  <td className="px-4 py-4 text-right text-text-muted tabular-nums font-semibold tracking-tight">
-                    {formatter.format(ingreso.valor / 2)}
+              })}
+
+              {isAdding && (
+                <tr className="relative overflow-hidden bg-surface-hover/60 border-b border-border/30">
+                  <td className="px-4 py-4">
+                    <input type="text" placeholder="Ej. Salario" className="w-full border border-border/40 bg-base text-text-main rounded p-1 text-sm focus:outline-none focus:ring-1 focus:ring-[#10B981]/40 transition-all" value={nuevoNombre} onChange={(e) => setNuevoNombre(e.target.value)} />
                   </td>
                   <td className="px-4 py-4">
-                    <div className="flex items-center justify-end gap-2">
-                      <button onClick={() => handleStartEdit(ingreso)} className="text-text-muted hover:text-text-main transition-colors p-1 rounded-lg hover:bg-surface-hover"><Edit2 className="w-4 h-4" /></button>
-                      <button onClick={() => setItemToDelete(ingreso)} className="text-text-muted hover:text-rose-500 transition-colors p-1 rounded-lg hover:bg-surface-hover"><Trash2 className="w-4 h-4" /></button>
+                    <input type="number" placeholder="Valor total" className="w-full border border-border/40 bg-base text-text-main rounded p-1 text-sm text-right tabular-nums font-semibold tracking-tight focus:outline-none focus:ring-1 focus:ring-[#10B981]/40 transition-all" value={nuevoValor} onChange={(e) => setNuevoValor(e.target.value)} />
+                  </td>
+                  <td className="px-4 py-4 text-right text-text-muted text-xs">Calc...</td>
+                  <td className="px-4 py-4 text-right text-text-muted text-xs">Calc...</td>
+                  <td className="px-4 py-4">
+                    <div className="flex items-center justify-end gap-3">
+                      <label className="flex items-center gap-1 text-[11px] font-medium text-text-muted cursor-pointer">
+                        <input 
+                          type="checkbox" 
+                          className="rounded accent-[#10B981] bg-base w-3.5 h-3.5 border-border/40 focus:outline-none focus:ring-1 focus:ring-[#10B981]/40" 
+                          checked={nuevoFijoCadaMes} 
+                          onChange={(e) => setNuevoFijoCadaMes(e.target.checked)} 
+                        /> Fijo
+                      </label>
+                      <div className="flex gap-1">
+                        <button onClick={handleAdd} className="p-1 text-[#10B981] hover:bg-surface-hover rounded-lg transition-colors focus:outline-none focus:ring-1 focus:ring-[#10B981]/40"><Check className="w-4 h-4" /></button>
+                        <button onClick={() => setIsAdding(false)} className="p-1 text-text-muted hover:bg-surface-hover rounded-lg transition-colors focus:outline-none focus:ring-1 focus:ring-border/40"><X className="w-4 h-4" /></button>
+                      </div>
                     </div>
                   </td>
                 </tr>
-              );
-            })}
-
-            {isAdding && (
-              <tr className="bg-surface-hover/60 border-b border-border/30">
-                <td className="px-4 py-4">
-                  <input type="text" placeholder="Ej. Salario" className="w-full border-border bg-base text-text-main rounded p-1 text-sm focus:ring-[#10B981]" value={nuevoNombre} onChange={(e) => setNuevoNombre(e.target.value)} />
-                </td>
-                <td className="px-4 py-4">
-                  <input type="number" placeholder="Valor total" className="w-full border-border bg-base text-text-main rounded p-1 text-sm text-right focus:ring-[#10B981] tabular-nums font-semibold tracking-tight" value={nuevoValor} onChange={(e) => setNuevoValor(e.target.value)} />
-                </td>
-                <td className="px-4 py-4 text-right text-text-muted text-xs">Calc...</td>
-                <td className="px-4 py-4 text-right text-text-muted text-xs">Calc...</td>
-                <td className="px-4 py-4">
-                  <div className="flex items-center justify-end gap-3">
-                    <label className="flex items-center gap-1 text-[11px] font-medium text-text-muted cursor-pointer">
-                      <input 
-                        type="checkbox" 
-                        className="rounded accent-[#10B981] bg-base w-3.5 h-3.5 border-border/40" 
-                        checked={nuevoFijoCadaMes} 
-                        onChange={(e) => setNuevoFijoCadaMes(e.target.checked)} 
-                      /> Fijo
-                    </label>
-                    <div className="flex gap-1">
-                      <button onClick={handleAdd} className="p-1 text-[#10B981] hover:bg-surface-hover rounded-lg transition-colors"><Check className="w-4 h-4" /></button>
-                      <button onClick={() => setIsAdding(false)} className="p-1 text-text-muted hover:bg-surface-hover rounded-lg transition-colors"><X className="w-4 h-4" /></button>
-                    </div>
-                  </div>
-                </td>
-              </tr>
-            )}
-            
-            {!datos?.length && !isAdding && (
-              <tr>
-                <td colSpan="5" className="px-4 py-8 text-center text-text-muted italic border-b border-border/30">No hay ingresos registrados aún.</td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+              )}
+              
+              {!datos?.length && !isAdding && (
+                <tr>
+                  <td colSpan="5" className="px-4 py-8 text-center text-text-muted italic border-b border-border/30">No hay ingresos registrados aún.</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </BentoCard>
 
       {/* Modal de Eliminación Inteligente */}
       {itemToDelete && (
@@ -241,19 +253,19 @@ export default function TablaIngresos({ mesId, perfil, datos, isAlejandro }) {
             <div className="bg-surface-hover px-6 py-4 flex flex-col gap-3 border-t border-border/30">
               <button 
                 onClick={() => confirmDelete('solo_mes')}
-                className="w-full bg-border hover:opacity-80 text-text-main font-semibold py-2.5 rounded-lg transition-colors"
+                className="w-full bg-border hover:opacity-80 text-text-main font-semibold py-2.5 rounded-lg transition-colors focus:outline-none focus:ring-1 focus:ring-border/40"
               >
                 Solo este mes
               </button>
               <button 
                 onClick={() => confirmDelete('futuros')}
-                className="w-full bg-rose-500 hover:bg-rose-600 text-white font-semibold py-2.5 rounded-lg transition-colors"
+                className="w-full bg-rose-500 hover:bg-rose-600 text-white font-semibold py-2.5 rounded-lg transition-colors focus:outline-none focus:ring-1 focus:ring-rose-500/40"
               >
                 Este mes y futuros
               </button>
               <button 
                 onClick={() => setItemToDelete(null)}
-                className="w-full text-text-muted hover:text-text-main font-medium py-2 transition-colors mt-1"
+                className="w-full text-text-muted hover:text-text-main font-medium py-2 transition-colors mt-1 focus:outline-none focus:ring-1 focus:ring-border/40"
               >
                 Cancelar
               </button>
