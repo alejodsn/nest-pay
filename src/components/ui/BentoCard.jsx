@@ -9,10 +9,11 @@ export default function BentoCard({
   className = '' 
 }) {
   return (
-    <div className={`bg-surface border border-border backdrop-blur-2xl rounded-3xl p-6 shadow-2xl transition-all duration-300 flex flex-col ${className}`}>
+    <div className={`relative bg-surface border border-border/60 backdrop-blur-2xl rounded-3xl p-6 shadow-xl transition-all duration-300 overflow-hidden before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-white/15 before:to-transparent ${className}`}>
+      
       {/* Header */}
-      <div className="flex justify-between items-center mb-4 relative z-10">
-        <h2 className="text-xl font-bold font-space text-text-main flex items-center gap-2">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="font-space font-bold text-lg text-text-main flex items-center gap-2">
           {title}
           {badge && (
             <span className="text-[10px] px-2 py-0.5 rounded-full bg-surface-hover text-text-muted border border-border uppercase tracking-wider font-semibold">
@@ -21,21 +22,21 @@ export default function BentoCard({
           )}
         </h2>
         {actionSlot && (
-          <div className="flex justify-end">
+          <div>
             {actionSlot}
           </div>
         )}
       </div>
 
       {/* Content */}
-      <div className="flex-1 relative z-0">
+      <div className="w-full overflow-hidden">
         {children}
       </div>
 
       {/* Footer */}
       {footerSlot && (
-        <div className="mt-6 flex justify-start relative z-10">
-          <div className="rounded-2xl bg-white/5 border border-border/40 px-4 py-2 text-sm font-semibold flex items-center justify-between w-full md:w-auto gap-8 shadow-sm backdrop-blur-sm">
+        <div className="mt-4 pt-3 border-t border-border/30 flex items-center justify-between">
+          <div className="inline-flex items-center gap-2 rounded-2xl bg-white/5 border border-white/10 px-4 py-2 text-sm font-semibold text-text-main">
             {footerSlot}
           </div>
         </div>
