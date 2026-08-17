@@ -95,7 +95,6 @@ export default function App() {
     }
   }, [mesSeleccionado]);
 
-  // Cálculos matemáticos extraídos para alimentar el Bento Grid centralizadamente
   const sumItems = (items = []) => items.reduce((acc, item) => acc + (Number(item.valor) || 0), 0);
 
   const stats = useMemo(() => {
@@ -152,7 +151,6 @@ export default function App() {
     return (
       <div className={isDarkMode ? 'dark' : ''}>
         <div className="min-h-screen flex items-center justify-center bg-base transition-colors duration-300 relative overflow-hidden">
-          {/* Halos luminosos (Efecto Aurora) */}
           <div className="hidden dark:block absolute top-[-10%] left-[-10%] w-[40rem] h-[40rem] bg-violet-600 rounded-full mix-blend-screen filter blur-[140px] opacity-20 pointer-events-none"></div>
           <div className="hidden dark:block absolute bottom-[-10%] right-[-10%] w-[40rem] h-[40rem] bg-blue-600 rounded-full mix-blend-screen filter blur-[140px] opacity-20 pointer-events-none"></div>
           
@@ -235,15 +233,15 @@ export default function App() {
           {/* 3. FILA HERO: MÉTRICAS GLOBALES */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <BentoCard title="Ingresos Totales (Familia)" badge="+" actionSlot={<span className="w-2 h-2 rounded-full bg-[#10B981] shadow-[0_0_8px_#10B981]"></span>}>
-              <p className="text-4xl font-bold text-[#10B981] font-space mt-2">{formatter.format(stats.ingresosTotales)}</p>
+              <p className="text-4xl font-bold text-[#10B981] font-space mt-2 tabular-nums tracking-tight">{formatter.format(stats.ingresosTotales)}</p>
             </BentoCard>
             
             <BentoCard title="Gastos Totales (Familia)" badge="-" actionSlot={<span className="w-2 h-2 rounded-full bg-[#F43F5E] shadow-[0_0_8px_#F43F5E]"></span>}>
-              <p className="text-4xl font-bold text-[#F43F5E] font-space mt-2">{formatter.format(stats.gastosTotales)}</p>
+              <p className="text-4xl font-bold text-[#F43F5E] font-space mt-2 tabular-nums tracking-tight">{formatter.format(stats.gastosTotales)}</p>
             </BentoCard>
             
             <BentoCard title="Disponible Familiar" badge="Neto" className="shadow-[0_0_30px_rgba(16,185,129,0.05)] dark:shadow-[0_0_40px_rgba(16,185,129,0.15)] border-[#10B981]/20">
-              <p className="text-4xl font-bold text-text-main font-space mt-2">{formatter.format(stats.disponibleFamiliar)}</p>
+              <p className="text-4xl font-bold text-text-main font-space mt-2 tabular-nums tracking-tight">{formatter.format(stats.disponibleFamiliar)}</p>
             </BentoCard>
           </div>
 
@@ -252,24 +250,8 @@ export default function App() {
             
             {/* Columna Izquierda */}
             <div className="lg:col-span-5 flex flex-col gap-6">
-              <BentoCard 
-                title="Ingresos" 
-                actionSlot={
-                  <button className="flex items-center gap-1 px-3 py-1.5 bg-surface-hover border border-border rounded-full text-xs font-bold hover:bg-brand-emerald/10 hover:text-[#10B981] transition-colors">
-                    <Plus className="w-3 h-3" /> Agregar
-                  </button>
-                }
-                footerSlot={
-                  <div className="flex justify-between items-center text-sm font-bold text-text-main pt-2">
-                    <span className="uppercase tracking-wider text-xs text-text-muted">Total Ingresos</span>
-                    <span className="text-lg">{formatter.format(perfilStats.ingresos)}</span>
-                  </div>
-                }
-              >
-                <div className="-mx-2">
-                  <TablaIngresos mesId={mesSeleccionado} isAlejandro={isAle} datos={perfilData?.ingresos} />
-                </div>
-              </BentoCard>
+              
+              <TablaIngresos mesId={mesSeleccionado} isAlejandro={isAle} datos={perfilData?.ingresos} />
 
               {isAle && (
                 <BentoCard title="Mercado (Alejandro)">
@@ -281,44 +263,27 @@ export default function App() {
 
               <BentoCard title="Transporte (T+1)" badge="Proyección">
                 <p className="text-text-muted text-sm mt-2">Reserva estimada de transporte para el mes siguiente basada en días hábiles.</p>
-                <p className="text-3xl font-bold text-text-main mt-4 font-space">{formatter.format(perfilStats.totalTransporte)}</p>
+                <p className="text-3xl font-bold text-text-main mt-4 font-space tabular-nums tracking-tight">{formatter.format(perfilStats.totalTransporte)}</p>
               </BentoCard>
+
+              {/* BANNER MODULAR: Disponible Perfil */}
+              <BentoCard title={`Disponible Neto (${isAle ? 'Alejandro' : 'Esposa'})`} badge="Balance" className="shadow-[0_0_30px_rgba(16,185,129,0.05)] border-[#10B981]/20 bg-gradient-to-br from-surface to-[#10B981]/5">
+                <p className="text-text-muted text-sm mt-2 mb-4">Balance final tras restar obligaciones y reservas a los ingresos totales.</p>
+                <p className={`text-4xl font-extrabold font-space tabular-nums tracking-tight ${perfilDisponible >= 0 ? 'text-[#10B981]' : 'text-[#F43F5E]'}`}>
+                  {formatter.format(perfilDisponible)}
+                </p>
+              </BentoCard>
+
             </div>
 
             {/* Columna Derecha */}
             <div className="lg:col-span-7 flex flex-col gap-6">
-              <BentoCard 
-                title="Gastos Fijos & Obligaciones"
-                actionSlot={
-                  <button className="flex items-center gap-1 px-3 py-1.5 bg-surface-hover border border-border rounded-full text-xs font-bold hover:bg-[#F43F5E]/10 hover:text-[#F43F5E] transition-colors">
-                    <Plus className="w-3 h-3" /> Agregar
-                  </button>
-                }
-                footerSlot={
-                  <div className="flex justify-between items-center text-sm font-bold text-text-main pt-2">
-                    <span className="uppercase tracking-wider text-xs text-text-muted">Total Gastos</span>
-                    <span className="text-lg">{formatter.format(perfilStats.gastos)}</span>
-                  </div>
-                }
-              >
-                <div className="-mx-2">
-                  <TablaGastos mesId={mesSeleccionado} isAlejandro={isAle} datos={perfilData} configuracion={data?.configuracion} />
-                </div>
-              </BentoCard>
+              <TablaGastos mesId={mesSeleccionado} isAlejandro={isAle} datos={perfilData} configuracion={data?.configuracion} />
             </div>
             
           </div>
 
-          {/* 5. BANNER DISPONIBLE DEL PERFIL */}
-          <div className="bg-gradient-to-r from-[#10B981]/10 to-transparent border border-[#10B981]/20 rounded-3xl p-6 mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 backdrop-blur-xl">
-            <div>
-              <p className="text-[#10B981] font-bold uppercase tracking-wider text-sm mb-1">Disponible Neto ({isAle ? 'Alejandro' : 'Esposa'})</p>
-              <p className="text-text-muted text-sm">Balance final del perfil tras restar obligaciones y reservas a los ingresos totales.</p>
-            </div>
-            <p className="text-4xl font-extrabold text-[#10B981] font-space">{formatter.format(perfilDisponible)}</p>
-          </div>
-
-          {/* 6. FILA INFERIOR: GESTIÓN OPERATIVA */}
+          {/* 5. FILA INFERIOR: GESTIÓN OPERATIVA */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <BentoCard title="Pendientes" badge="0 Tareas">
               <div className="flex flex-col items-center justify-center py-8 text-text-muted">
@@ -329,8 +294,8 @@ export default function App() {
             <BentoCard 
               title="Imprevistos" 
               actionSlot={
-                <button className="flex items-center gap-1 px-3 py-1.5 bg-surface-hover border border-border rounded-full text-xs font-bold hover:bg-[#F43F5E]/10 hover:text-[#F43F5E] transition-colors">
-                  <Plus className="w-3 h-3" /> Agregar
+                <button className="flex items-center gap-1 rounded-full px-4 py-1.5 text-xs font-semibold bg-[#F43F5E]/15 text-[#F43F5E] border border-[#F43F5E]/30 hover:bg-[#F43F5E]/25 shadow-lg backdrop-blur-md transition-all focus:outline-none focus:ring-1 focus:ring-[#F43F5E]/40">
+                  <Plus className="w-4 h-4" /> Agregar
                 </button>
               }
             >
@@ -343,9 +308,9 @@ export default function App() {
               <div className="flex flex-col gap-2 mt-4">
                 <div className="flex justify-between text-sm">
                   <span className="text-text-muted">Progreso Global</span>
-                  <span className="font-bold text-text-main">0%</span>
+                  <span className="font-bold text-text-main tabular-nums tracking-tight">0%</span>
                 </div>
-                <div className="h-2 w-full bg-surface-hover border border-border rounded-full overflow-hidden">
+                <div className="h-2 w-full bg-surface-hover border border-border/40 rounded-full overflow-hidden">
                   <div className="h-full bg-[#10B981] w-0"></div>
                 </div>
               </div>
