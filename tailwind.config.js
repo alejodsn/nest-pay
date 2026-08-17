@@ -8,6 +8,12 @@ export default {
   theme: {
     extend: {
       colors: {
+        base: 'var(--color-base)',
+        surface: 'var(--color-surface)',
+        'surface-hover': 'var(--color-surface-hover)',
+        'text-main': 'var(--color-text-main)',
+        'text-muted': 'var(--color-text-muted)',
+        border: 'var(--color-border)',
         brand: {
           50: '#f0fdf4',
           100: '#dcfce7',
