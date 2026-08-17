@@ -4,16 +4,17 @@ export default function BentoCard({
   title, 
   badge, 
   actionSlot, 
-  footerSlot, 
+  totalAmount,
+  totalLabel,
   children, 
   className = '' 
 }) {
   return (
-    <div className={`relative border border-white/[0.07] bg-gradient-to-b from-white/[0.04] to-white/[0.01] backdrop-blur-xl rounded-3xl p-6 shadow-[0_8px_32px_0_rgba(0,0,0,0.36)] transition-all duration-300 overflow-hidden before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-white/15 before:to-transparent ${className}`}>
+    <div className={`relative w-full bg-surface border border-white/[0.08] backdrop-blur-xl rounded-3xl p-6 shadow-2xl transition-all duration-300 flex flex-col justify-between ${className}`}>
       
-      {/* Header */}
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="font-space font-bold text-lg text-white/95 flex items-center gap-2">
+      {/* Cabecera */}
+      <div className="flex items-center justify-between gap-4 mb-5">
+        <h2 className="font-sans font-bold text-lg text-white/95 tracking-tight flex items-center gap-2">
           {title}
           {badge && (
             <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/[0.03] text-white/70 border border-white/[0.06] uppercase tracking-wider font-semibold">
@@ -21,6 +22,7 @@ export default function BentoCard({
             </span>
           )}
         </h2>
+        
         {actionSlot && (
           <div>
             {actionSlot}
@@ -28,16 +30,19 @@ export default function BentoCard({
         )}
       </div>
 
-      {/* Content */}
-      <div className="w-full overflow-hidden">
+      {/* Cuerpo */}
+      <div className="w-full flex-1">
         {children}
       </div>
 
-      {/* Footer */}
-      {footerSlot && (
-        <div className="mt-4 pt-3 border-t border-white/[0.04] flex items-center justify-between">
-          <div className="inline-flex items-center gap-2 rounded-xl bg-white/[0.03] border border-white/[0.06] px-4 py-2 text-sm font-medium text-white/90">
-            {footerSlot}
+      {/* Pie / Footer */}
+      {(totalAmount || totalLabel) && (
+        <div className="mt-5 pt-4 border-t border-white/[0.05] flex items-center justify-between">
+          <div className="text-xs uppercase tracking-wider text-white/40 font-semibold">
+            {totalLabel}
+          </div>
+          <div className="text-xl font-bold text-brand-emerald font-sans tabular-nums">
+            {totalAmount}
           </div>
         </div>
       )}
