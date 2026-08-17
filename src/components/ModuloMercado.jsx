@@ -25,17 +25,12 @@ export default function ModuloMercado({ mesId, datos, configuracion }) {
 
   const restante = presupuestoTotal - totalGastado;
   
-  // Lógica del termómetro
   const porcentajeGastado = presupuestoTotal > 0 ? (totalGastado / presupuestoTotal) * 100 : 0;
-  const progresoMes = getMonthProgress(mesId); // Porcentaje del mes transcurrido
+  const progresoMes = getMonthProgress(mesId); 
 
-  // Determinar color de la barra: 
-  // Verde si gastado <= progresoMes + 10% (margen)
-  // Naranja si gastado <= progresoMes + 20%
-  // Rojo si gastado > progresoMes + 20% o gastado > 100%
-  let barraColor = 'bg-brand-500';
+  let barraColor = 'bg-[#10B981]';
   if (porcentajeGastado > progresoMes + 20 || porcentajeGastado > 100) {
-    barraColor = 'bg-rose-500';
+    barraColor = 'bg-[#F43F5E]';
   } else if (porcentajeGastado > progresoMes + 10) {
     barraColor = 'bg-orange-500';
   }
@@ -66,46 +61,42 @@ export default function ModuloMercado({ mesId, datos, configuracion }) {
   };
 
   return (
-    <div className="bg-surface rounded-xl shadow-sm border border-border overflow-hidden mb-6">
-      <div className="px-6 py-4 border-b border-border flex justify-between items-center bg-surface-hover">
-        <h2 className="text-lg font-bold text-text-main flex items-center gap-2">
-          <ShoppingCart className="w-5 h-5 text-brand-600" /> Mercado (Alejandro)
-        </h2>
+    <div className="w-full">
+      <div className="w-full flex justify-end mb-4">
         <button 
           onClick={() => setIsAdding(!isAdding)}
-          className="flex items-center gap-2 text-sm bg-brand-500 hover:bg-brand-600 text-white py-2 px-4 rounded-lg transition-colors"
+          className="flex items-center gap-1 rounded-full px-4 py-1.5 text-xs font-semibold bg-[#10B981]/15 text-[#10B981] border border-[#10B981]/30 hover:bg-[#10B981]/25 transition-all shadow-sm"
         >
           <Plus className="w-4 h-4" /> Registrar Ticket
         </button>
       </div>
 
-      <div className="p-6">
+      <div className="px-2">
         {/* Termómetro de Presupuesto */}
         <div className="mb-8">
-          <div className="flex justify-between text-sm mb-2">
+          <div className="flex justify-between text-sm mb-3">
             <span className="font-semibold text-text-main">Progreso del Presupuesto</span>
-            <span className="font-medium text-text-muted">{porcentajeGastado.toFixed(1)}%</span>
+            <span className="font-medium text-text-muted tabular-nums tracking-tight">{porcentajeGastado.toFixed(1)}%</span>
           </div>
-          <div className="h-4 w-full bg-border rounded-full overflow-hidden relative">
+          <div className="h-2.5 w-full bg-white/5 border border-border/40 rounded-full overflow-hidden relative">
             <div 
               className={`h-full ${barraColor} transition-all duration-500`}
               style={{ width: `${Math.min(porcentajeGastado, 100)}%` }}
             ></div>
-            {/* Indicador del día del mes actual */}
             <div 
-              className="absolute top-0 bottom-0 w-1 bg-text-main z-10 opacity-30"
+              className="absolute top-0 bottom-0 w-0.5 bg-text-main/50 z-10"
               style={{ left: `${progresoMes}%` }}
               title="Día actual del mes"
             ></div>
           </div>
-          <div className="flex justify-between mt-3">
+          <div className="flex justify-between mt-4">
             <div>
-              <p className="text-xs text-text-muted uppercase font-bold tracking-wider">Gastado</p>
-              <p className="text-lg font-bold text-text-main">{formatter.format(totalGastado)}</p>
+              <p className="text-[10px] text-text-muted uppercase font-bold tracking-widest mb-0.5">Gastado</p>
+              <p className="text-xl font-bold text-text-main tabular-nums tracking-tight">{formatter.format(totalGastado)}</p>
             </div>
             <div className="text-right">
-              <p className="text-xs text-text-muted uppercase font-bold tracking-wider">Restante</p>
-              <p className={`text-lg font-bold ${restante < 0 ? 'text-rose-600' : 'text-brand-600'}`}>
+              <p className="text-[10px] text-text-muted uppercase font-bold tracking-widest mb-0.5">Restante</p>
+              <p className={`text-xl font-bold tabular-nums tracking-tight ${restante < 0 ? 'text-[#F43F5E]' : 'text-[#10B981]'}`}>
                 {formatter.format(restante)}
               </p>
             </div>
@@ -114,51 +105,51 @@ export default function ModuloMercado({ mesId, datos, configuracion }) {
 
         {/* Formulario para agregar */}
         {isAdding && (
-          <form onSubmit={handleAddTicket} className="bg-surface-hover p-4 rounded-lg border border-border mb-6 grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+          <form onSubmit={handleAddTicket} className="bg-surface-hover/60 p-5 rounded-2xl border border-border/40 mb-8 grid grid-cols-1 md:grid-cols-4 gap-4 items-end transition-all">
             <div>
-              <label className="block text-xs font-semibold text-text-muted mb-1">Fecha</label>
+              <label className="block text-xs font-semibold text-text-muted mb-1.5">Fecha</label>
               <div className="relative">
                 <Calendar className="w-4 h-4 absolute left-3 top-2.5 text-text-muted" />
                 <input 
                   type="date" 
                   required
-                  className="w-full pl-9 pr-3 py-2 rounded-lg border border-border bg-base text-text-main focus:ring-brand-500 focus:border-brand-500 text-sm"
+                  className="w-full pl-9 pr-3 py-2 rounded-xl border border-border/40 bg-base text-text-main focus:ring-[#10B981] focus:border-[#10B981] text-sm font-medium"
                   value={fecha}
                   onChange={(e) => setFecha(e.target.value)}
                 />
               </div>
             </div>
             <div>
-              <label className="block text-xs font-semibold text-text-muted mb-1">Establecimiento</label>
+              <label className="block text-xs font-semibold text-text-muted mb-1.5">Establecimiento</label>
               <div className="relative">
                 <Store className="w-4 h-4 absolute left-3 top-2.5 text-text-muted" />
                 <input 
                   type="text" 
                   required
                   placeholder="Ej. D1, Exito"
-                  className="w-full pl-9 pr-3 py-2 rounded-lg border border-border bg-base text-text-main focus:ring-brand-500 focus:border-brand-500 text-sm"
+                  className="w-full pl-9 pr-3 py-2 rounded-xl border border-border/40 bg-base text-text-main focus:ring-[#10B981] focus:border-[#10B981] text-sm font-medium"
                   value={establecimiento}
                   onChange={(e) => setEstablecimiento(e.target.value)}
                 />
               </div>
             </div>
             <div>
-              <label className="block text-xs font-semibold text-text-muted mb-1">Valor</label>
+              <label className="block text-xs font-semibold text-text-muted mb-1.5">Valor</label>
               <input 
                 type="number" 
                 required
                 placeholder="0"
-                className="w-full px-3 py-2 rounded-lg border border-border bg-base text-text-main focus:ring-brand-500 focus:border-brand-500 text-sm text-right"
+                className="w-full px-3 py-2 rounded-xl border border-border/40 bg-base text-text-main focus:ring-[#10B981] focus:border-[#10B981] text-sm text-right tabular-nums tracking-tight font-medium"
                 value={valor}
                 onChange={(e) => setValor(e.target.value)}
               />
             </div>
-            <div className="flex gap-2">
-              <button type="submit" className="flex-1 bg-brand-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-brand-700 transition-colors">
+            <div className="flex gap-2 h-10">
+              <button type="submit" className="flex-1 bg-[#10B981] text-white rounded-xl text-sm font-bold hover:bg-[#10B981]/90 transition-colors shadow-sm">
                 Guardar
               </button>
-              <button type="button" onClick={() => setIsAdding(false)} className="px-4 bg-border text-text-main rounded-lg hover:opacity-80 transition-colors">
-                Cancelar
+              <button type="button" onClick={() => setIsAdding(false)} className="px-4 bg-border/40 text-text-main rounded-xl hover:bg-border transition-colors font-medium text-sm">
+                X
               </button>
             </div>
           </form>
@@ -166,27 +157,27 @@ export default function ModuloMercado({ mesId, datos, configuracion }) {
 
         {/* Lista de Tickets */}
         <div>
-          <h3 className="text-sm font-bold text-text-muted uppercase tracking-wider mb-3">Historial de Compras</h3>
-          <div className="space-y-3">
+          <h3 className="text-xs font-bold text-text-muted/70 uppercase tracking-wider mb-4 border-b border-border/40 pb-2">Historial de Compras</h3>
+          <div className="space-y-1">
             {tickets.map(ticket => (
-              <div key={ticket.id} className="flex justify-between items-center p-3 hover:bg-surface-hover rounded-lg border border-transparent transition-colors">
+              <div key={ticket.id} className="flex justify-between items-center p-3 hover:bg-surface-hover/60 rounded-xl border border-transparent transition-colors duration-150">
                 <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 bg-brand-50 rounded-full flex items-center justify-center text-brand-600">
-                    <Store className="w-5 h-5" />
+                  <div className="w-10 h-10 bg-surface-hover border border-border/40 rounded-full flex items-center justify-center text-text-muted">
+                    <ShoppingCart className="w-4 h-4" />
                   </div>
                   <div>
-                    <p className="font-semibold text-text-main">{ticket.establecimiento}</p>
-                    <p className="text-xs text-text-muted">{ticket.fecha}</p>
+                    <p className="font-semibold text-text-main text-sm">{ticket.establecimiento}</p>
+                    <p className="text-xs text-text-muted/80">{ticket.fecha}</p>
                   </div>
                 </div>
-                <div className="font-bold text-text-main">
+                <div className="font-bold text-text-main tabular-nums tracking-tight">
                   {formatter.format(ticket.valor)}
                 </div>
               </div>
             ))}
             
             {!tickets.length && (
-              <p className="text-center text-text-muted text-sm italic py-4">No hay compras registradas este mes.</p>
+              <p className="text-center text-text-muted text-sm italic py-6">No hay compras registradas este mes.</p>
             )}
           </div>
         </div>
