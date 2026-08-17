@@ -93,7 +93,7 @@ export default function App() {
           {/* Auras de fondo (Glassmorphism) */}
           <div className="hidden dark:block absolute top-[-10%] left-[-10%] w-[40rem] h-[40rem] bg-violet-600 rounded-full mix-blend-screen filter blur-[120px] opacity-20 pointer-events-none"></div>
           <div className="hidden dark:block absolute bottom-[-10%] right-[-10%] w-[40rem] h-[40rem] bg-blue-600 rounded-full mix-blend-screen filter blur-[120px] opacity-20 pointer-events-none"></div>
-          
+
           <div className="flex flex-col items-center gap-4 text-text-muted relative z-10">
             <div className="w-8 h-8 border-4 border-brand-500 border-t-transparent rounded-full animate-spin"></div>
             <p className="font-medium">Cargando Familia Financiera...</p>
@@ -112,11 +112,11 @@ export default function App() {
         {/* Auras de fondo (Glassmorphism) */}
         <div className="hidden dark:block absolute top-[-10%] left-[-10%] w-[40rem] h-[40rem] bg-violet-600 rounded-full mix-blend-screen filter blur-[120px] opacity-20 pointer-events-none"></div>
         <div className="hidden dark:block absolute bottom-[-10%] right-[-10%] w-[40rem] h-[40rem] bg-blue-600 rounded-full mix-blend-screen filter blur-[120px] opacity-20 pointer-events-none"></div>
-        
+
         <div className="max-w-[1400px] mx-auto">
           {/* Header Unificado / Floating Bar */}
           <header className="mb-8 bg-surface backdrop-blur-xl dark:backdrop-blur-2xl p-5 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-border relative flex flex-col gap-6 transition-all duration-300 z-10">
-            
+
             {/* Fila Superior (Top - Centrado absoluto) */}
             <div className="absolute top-5 left-1/2 transform -translate-x-1/2 flex items-center gap-3">
               <div className="w-12 h-12 bg-gradient-to-br from-brand-500 to-brand-700 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-brand-500/30">
@@ -148,7 +148,7 @@ export default function App() {
                     </button>
                   </div>
 
-                  <button 
+                  <button
                     onClick={() => setIsDarkMode(!isDarkMode)}
                     className="p-3.5 bg-surface border border-border rounded-2xl text-text-muted hover:text-brand-500 transition-all shadow-sm flex items-center justify-center group dark:backdrop-blur-md"
                     aria-label="Toggle Dark Mode"
@@ -186,7 +186,7 @@ export default function App() {
 
           {/* Contenido Dinámico - Bento Grid */}
           <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 animate-fade-in relative z-0">
-            
+
             {/* Columna Izquierda */}
             <div className="xl:col-span-5 flex flex-col gap-8">
               <div className="rounded-[2.5rem] bg-surface backdrop-blur-xl dark:backdrop-blur-2xl border border-border shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.12)] p-6 transition-all duration-300">
