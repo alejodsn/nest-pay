@@ -220,7 +220,7 @@ export default function App() {
               </button>
             </div>
 
-            {/* Derecha */}
+            {/* Derecha - Theme Toggle Oculto Temporalmente
             <button 
               onClick={() => setIsDarkMode(!isDarkMode)}
               className="p-3 bg-surface border border-border rounded-full text-text-muted hover:text-[#10B981] transition-all shadow-sm flex items-center justify-center group dark:backdrop-blur-md"
@@ -228,21 +228,22 @@ export default function App() {
             >
               {isDarkMode ? <Sun className="w-5 h-5 group-hover:rotate-90 transition-transform duration-300" /> : <Moon className="w-5 h-5 group-hover:-rotate-12 transition-transform duration-300" />}
             </button>
+            */}
             
           </header>
 
           {/* 3. FILA HERO: MÉTRICAS GLOBALES */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <BentoCard title="Ingresos Totales (Familia)" badge="+" actionSlot={<span className="w-2 h-2 rounded-full bg-[#10B981] shadow-[0_0_8px_#10B981]"></span>}>
+            <BentoCard title="Ingresos Totales (Familia)" badge="+">
               <p className="text-4xl font-bold text-[#10B981] font-space mt-2 tabular-nums tracking-tight">{formatter.format(stats.ingresosTotales)}</p>
             </BentoCard>
             
-            <BentoCard title="Gastos Totales (Familia)" badge="-" actionSlot={<span className="w-2 h-2 rounded-full bg-[#F43F5E] shadow-[0_0_8px_#F43F5E]"></span>}>
+            <BentoCard title="Gastos Totales (Familia)" badge="-">
               <p className="text-4xl font-bold text-[#F43F5E] font-space mt-2 tabular-nums tracking-tight">{formatter.format(stats.gastosTotales)}</p>
             </BentoCard>
             
-            <BentoCard title="Disponible Familiar" badge="Neto" className="shadow-[0_0_30px_rgba(16,185,129,0.05)] dark:shadow-[0_0_40px_rgba(16,185,129,0.15)] border-[#10B981]/20">
-              <p className="text-4xl font-bold text-text-main font-space mt-2 tabular-nums tracking-tight">{formatter.format(stats.disponibleFamiliar)}</p>
+            <BentoCard title="Disponible Familiar" badge="Neto">
+              <p className="text-4xl font-bold text-white font-space mt-2 tabular-nums tracking-tight">{formatter.format(stats.disponibleFamiliar)}</p>
             </BentoCard>
           </div>
 
