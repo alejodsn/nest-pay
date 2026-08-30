@@ -242,7 +242,7 @@ export default function App() {
             </BentoCard>
             
             <BentoCard title="Disponible Familiar" badge="Neto">
-              <p className="text-4xl font-bold text-white font-space mt-2 tabular-nums tracking-tight">{formatter.format(stats.disponibleFamiliar)}</p>
+              <p className="text-4xl font-bold text-text-main font-space mt-2 tabular-nums tracking-tight">{formatter.format(stats.disponibleFamiliar)}</p>
             </BentoCard>
           </div>
 
