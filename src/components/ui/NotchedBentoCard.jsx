@@ -14,97 +14,86 @@ export default function NotchedBentoCard({
   const hasAction = Boolean(onAction || action);
 
   return (
-    <div
-      className={`
-        relative w-full
-        bg-surface
-        backdrop-blur-xl
-        rounded-3xl
-        border border-border
-        shadow-xl
-        transition-all duration-300
-        ${className}
-      `}
-    >
+    <div className={`relative w-full drop-shadow-xl transition-all duration-300 flex flex-col justify-between z-0 ${className}`}>
+      
+      {/* ================= BACKGROUND ASSEMBLY ================= */}
+      <div className="absolute inset-0 z-0 flex pointer-events-none">
+        
+        {/* Left Pillar (Full Height) */}
+        <div className="flex-1 h-full bg-surface backdrop-blur-xl border-t border-l border-b border-border rounded-l-3xl"></div>
+        
+        {/* Right Pillar (Notch space + Solid bottom) */}
+        <div className="w-[164px] h-full relative">
+          {/* Solid Bottom Area */}
+          <div className="absolute top-[100px] right-0 bottom-0 w-full bg-surface backdrop-blur-xl border-r border-b border-border rounded-br-3xl"></div>
+        </div>
+
+      </div>
+
+      {/* ================= NOTCH EXACT GEOMETRY ================= */}
+      {/* Background & Blur for the Notch curves */}
+      <div 
+        className="absolute top-0 right-0 w-[164px] h-[100px] bg-surface pointer-events-none z-0"
+        style={{ 
+          clipPath: 'path("M 0 100 L 0 0 A 24 24 0 0 1 24 24 L 24 52 A 24 24 0 0 0 48 76 L 140 76 A 24 24 0 0 1 164 100 Z")',
+          backdropFilter: 'blur(24px)', 
+          WebkitBackdropFilter: 'blur(24px)'
+        }}
+      ></div>
+      
+      {/* Crisp Continuous Border for the Notch */}
+      <svg width="164" height="100" className="absolute top-0 right-0 pointer-events-none z-0 overflow-visible">
+        <path 
+          d="M 0 0 A 24 24 0 0 1 24 24 L 24 52 A 24 24 0 0 0 48 76 L 140 76 A 24 24 0 0 1 164 100" 
+          fill="none" 
+          stroke="var(--color-border)" 
+          strokeWidth="1" 
+        />
+      </svg>
+
+      {/* ================= ACTION BUTTON ================= */}
       {hasAction && (
-        <>
-          {/* NOTCH SUPERIOR DERECHO */}
-          <div
-            className="
-              absolute
-              top-[-1px]
-              right-[-1px]
-              z-30
-              flex
-              items-start
-              justify-end
-              bg-base
-              rounded-bl-[28px]
-              pl-5
-              pb-5
-              pr-4
-              pt-4
-            "
-          >
-            {/* Curva superior izquierda de la muesca */}
-            <div className="absolute top-0 left-[-20px] w-5 h-5 pointer-events-none overflow-hidden" aria-hidden="true">
-              <div className="absolute inset-0 bg-base" style={{ clipPath: 'path("M20 0 A20 20 0 0 0 0 20 L20 20 Z")' }} />
-            </div>
-
-            {/* Curva inferior derecha de la muesca */}
-            <div className="absolute bottom-[-20px] right-0 w-5 h-5 pointer-events-none overflow-hidden" aria-hidden="true">
-              <div className="absolute inset-0 bg-base" style={{ clipPath: 'path("M0 0 L0 20 A20 20 0 0 0 20 0 Z")' }} />
-            </div>
-
-            {/* Acción / botón */}
-            <div className="relative z-10 flex items-start justify-end w-fit">
-              {action ? (
-                action
-              ) : (
-                <button
-                  type="button"
-                  onClick={onAction}
-                  className="whitespace-nowrap flex items-center gap-1.5 px-4 py-2 shrink-0 rounded-full text-xs font-bold bg-brand-emerald/15 text-brand-emerald border border-brand-emerald/30 hover:bg-brand-emerald/25 transition-all shadow-sm outline-none focus:outline-none"
-                >
-                  <Plus className="w-4 h-4" />
-                  {actionLabel}
-                </button>
-              )}
-            </div>
-          </div>
-        </>
+        <div className="absolute top-0 right-0 w-[140px] h-[76px] flex items-center justify-center z-20">
+          {action ? action : (
+            <button
+              type="button"
+              onClick={onAction}
+              className="whitespace-nowrap flex items-center gap-1.5 px-4 py-2 shrink-0 rounded-full text-xs font-bold bg-brand-emerald/15 text-brand-emerald border border-brand-emerald/30 hover:bg-brand-emerald/25 transition-all shadow-sm outline-none focus:outline-none"
+            >
+              <Plus className="w-4 h-4" />
+              {actionLabel}
+            </button>
+          )}
+        </div>
       )}
 
-      {/* CUERPO DE LA TARJETA */}
-      <div className="relative z-20 flex flex-col h-full pt-6">
-        <div className="px-6 pb-4">
-          <h2 className="font-sans font-bold text-lg text-text-main flex items-center gap-2">
+      {/* ================= CONTENT ================= */}
+      <div className="relative z-10 p-6 flex flex-col justify-between h-full">
+        
+        {/* Header */}
+        <div className="flex items-center justify-between gap-4 mb-5 min-h-[32px]">
+          <h2 className={`font-sans font-bold text-lg text-text-main flex items-center gap-2 ${hasAction ? 'pr-[116px]' : ''}`}>
             {title}
           </h2>
         </div>
 
-        <div className="w-full overflow-hidden flex-1 px-6">
+        {/* Body */}
+        <div className="w-full flex-1 relative z-10">
           {children}
         </div>
 
+        {/* Footer */}
         {(totalAmount || totalLabel) && (
-          <div className="px-6 pb-6 pt-6 mt-4 flex justify-between items-end border-t border-border">
-            <div className="flex flex-col justify-end">
-              {totalLabel && (
-                <span className="text-xs uppercase tracking-wider text-text-muted font-semibold mb-1">
-                  {totalLabel}
-                </span>
-              )}
+          <div className="mt-5 pt-4 border-t border-border flex items-center justify-between relative z-10">
+            <div className="text-xs uppercase tracking-wider text-text-muted font-semibold">
+              {totalLabel}
             </div>
-            {totalAmount && (
-              <div className="flex flex-col justify-end">
-                <span className="text-xl md:text-2xl font-bold text-brand-emerald font-sans tracking-tight tabular-nums">
-                  {totalAmount}
-                </span>
-              </div>
-            )}
+            <div className="text-xl font-bold text-brand-emerald font-sans tabular-nums">
+              {totalAmount}
+            </div>
           </div>
         )}
+        
       </div>
     </div>
   );
