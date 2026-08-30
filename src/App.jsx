@@ -220,7 +220,7 @@ export default function App() {
               </button>
             </div>
 
-            {/* Derecha - Theme Toggle Oculto Temporalmente
+            {/* Derecha - Theme Toggle */}
             <button 
               onClick={() => setIsDarkMode(!isDarkMode)}
               className="p-3 bg-surface border border-border rounded-full text-text-muted hover:text-[#10B981] transition-all shadow-sm flex items-center justify-center group dark:backdrop-blur-md"
@@ -228,7 +228,6 @@ export default function App() {
             >
               {isDarkMode ? <Sun className="w-5 h-5 group-hover:rotate-90 transition-transform duration-300" /> : <Moon className="w-5 h-5 group-hover:-rotate-12 transition-transform duration-300" />}
             </button>
-            */}
             
           </header>
 
